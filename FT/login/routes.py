@@ -9,4 +9,4 @@ def user_login():
 
 @forgot_password.route('/forgot_password')
 def user_password():
-    return "Forgot password"
+    return render_template("user_password.html")
