@@ -1,12 +1,12 @@
-from flask import Blueprint
+from flask import Blueprint, render_template
 
-start = Blueprint('start', __name__)
-test = Blueprint('test', __name__)
+login = Blueprint('login', __name__, static_folder="static", template_folder="templates")
+forgot_password = Blueprint('forgot_password', __name__)
 
-@start.route('/')
-def index():
-    return "This is an example app2"
+@login.route('/login')
+def user_login():
+    return render_template("user_login.html")
 
-@test.route('/test')
-def index2():
-    return "This is an example app3"
+@forgot_password.route('/forgot_password')
+def user_password():
+    return "Forgot password"

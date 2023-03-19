@@ -1,8 +1,7 @@
 from FT import app
 from .login import routes as login
-from .admin import routes as admin
+from .page import routes as page
 
-app.register_blueprint(login.start)
-app.register_blueprint(login.test)
-app.register_blueprint(admin.end)
-app.register_blueprint(admin.test2)
+app.register_blueprint(page.page)
+app.register_blueprint(login.login)
+app.register_blueprint(login.forgot_password)
