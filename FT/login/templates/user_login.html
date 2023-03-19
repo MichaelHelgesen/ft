@@ -2,8 +2,15 @@
 
 {% block content%}
     <h2>Login</h2>
+    {% if name %}
+    <h3>Hello {{ name }}</h3>
+    {% endif %}
+    <form action="#" method="post">
+        {{ form.hidden_tag() }}
+        {{ form.name.label }}
+        {{ form.name }}
+        <input type="submit" value="Submit" />
+    </form>
     <a href="{{ url_for('forgot_password.user_password') }}">Forgot password?</a>
-
-
 
 {% endblock %}
