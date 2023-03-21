@@ -1,8 +1,9 @@
 from FT import db
 from datetime import datetime
+from flask_login import UserMixin
 
 # Create database model
-class Users(db.Model):
+class Users(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     username = db.Column(db.String(20), nullable=False)
