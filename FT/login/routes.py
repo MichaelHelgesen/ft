@@ -3,6 +3,7 @@ from FT.forms import webforms
 from FT import db
 from FT.models.add_user import Users
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import login_user, login_required, current_user
 
 login = Blueprint('login', __name__, static_folder="static", template_folder="templates")
 
@@ -19,8 +20,8 @@ def user_login():
             if check_password_hash(user.password_hash, form.password.data):
                 name = user.name
                 form.email.data = ""
-                print(form)
-                return render_template("user_login.html", form=form, name=name)
+                login_user(user, remember=True)
+                return render_template("profile.html", name=name)
             else:
                 flash("Password is wrong")
                 form.email.data = ""
@@ -55,3 +56,8 @@ def user_register():
             return render_template("user_register.html", form=form)
     else:
         return render_template("user_register.html", form=form)
+
+@login.route('/profile')
+@login_required
+def user_profile():
+        return render_template("profile.html", name=current_user.name)
