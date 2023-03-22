@@ -16,9 +16,14 @@
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="{{ url_for('login.user_register')}}">Register</a>
                 </li>
+                {% if current_user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="{{ url_for('login.user_profile')}}">Profile</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{{ url_for('login.user_logout')}}">Logout</a>
+                </li>
+                {% endif %}
             </ul>
             <form class="d-flex" role="search" method="POST" action="">
                 <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="searched">

@@ -11,7 +11,7 @@
     {% if name %}
     <h3>Hello {{ name }}</h3>
     {% endif %}
-    <form action="#" method="post">
+    <form action="{{ url_for('login.user_login') }}" method="POST">
         {{ form.hidden_tag() }}
         {{ form.email.label }}
         {{ form.email }}

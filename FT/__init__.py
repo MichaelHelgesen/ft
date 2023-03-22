@@ -1,6 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
 
 # create the extension
 db = SQLAlchemy()
@@ -13,10 +15,15 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///ft.db"
 db.init_app(app)
 
 login_manager = LoginManager()
-login_manager.login_view = 'user_profile'
+login_manager.login_view = 'login.user_login'
 login_manager.init_app(app)
 
+
+
 from .models.add_user import Users
+
+admin = Admin(app)
+admin.add_view(ModelView(Users, db.session))
 
 @login_manager.user_loader
 def load_user(user_id):

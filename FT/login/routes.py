@@ -1,9 +1,9 @@
-from flask import Blueprint, render_template, flash
+from flask import Blueprint, render_template, flash, redirect, url_for
 from FT.forms import webforms
 from FT import db
 from FT.models.add_user import Users
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, login_required, current_user
+from flask_login import login_user, login_required, current_user, logout_user
 
 login = Blueprint('login', __name__, static_folder="static", template_folder="templates")
 
@@ -31,6 +31,7 @@ def user_login():
         return render_template("user_login.html", form=form)
 
 @login.route("/register", methods=["GET", "POST"])
+@login_required
 def user_register():
     form = webforms.UserForm()
     if form.validate_on_submit():
@@ -61,3 +62,9 @@ def user_register():
 @login_required
 def user_profile():
         return render_template("profile.html", name=current_user.name)
+
+@login.route('/logout')
+@login_required
+def user_logout():
+        logout_user()
+        return redirect(url_for("page.index"))
