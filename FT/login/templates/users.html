@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content%}
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>{{ message }}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+    <h2>Users</h2>
+    {% for users in users %}
+        <a href="{{ url_for('login.admin_user_update', id=users.id) }}">{{ users.name }}</a>
+    {% endfor %}
+<br />
+<br />
+    <a href="{{ url_for('login.download_data') }}">Export users</a>
+    <br />
+    <br />
+    <h2>Importer brukere</h2>
+    <form action="#" method="POST" enctype=multipart/form-data><p>
+        {{ form.hidden_tag() }}
+        {{ form.file.label }}
+        {{ form.file }}
+        {{ form.submit }}
+    </form>
+{% endblock %}

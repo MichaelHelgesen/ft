@@ -3,12 +3,14 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
-
+from tablib import Dataset
+import flask_excel as excel
 # create the extension
 db = SQLAlchemy()
 
 #Create a Flask Instance
 app = Flask(__name__)
+excel.init_excel(app)
 # configure the SQLite database, relative to the app instance folder
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///ft.db"
 # initialize the app with the extension
@@ -23,7 +25,16 @@ login_manager.init_app(app)
 from .models.add_user import Users
 
 admin = Admin(app)
-admin.add_view(ModelView(Users, db.session))
+
+class UserView(ModelView):
+    column_hide_backrefs = False
+    can_export = True
+    export_types = ['csv', "xls"]
+    column_auto_select_related = True
+    column_list = ("name", 'username', "email", "role", "date_added")
+    
+
+admin.add_view(UserView(Users, db.session))
 
 @login_manager.user_loader
 def load_user(user_id):
