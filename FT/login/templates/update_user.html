@@ -25,5 +25,7 @@
     <br />
     {{ form.submit }}
 </form>
-
+<br /><br />
+<h2>Slett bruker</h2>
+<a href="{{url_for('login.delete_user', id=user.id)}}">Slett bruker</a>
 {% endblock %}

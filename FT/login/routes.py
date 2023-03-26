@@ -89,7 +89,6 @@ def admin_users():
     if request.method == "POST":
         #df = pd.read_csv(request.files.get('file'))
         df = pd.read_excel(request.files.get('file'))
-        #print(df)
         
         for index in df.index:
             check_user = Users.query.filter_by(email = df["email"][index]).first()
@@ -98,7 +97,8 @@ def admin_users():
                 user.name = df["name"][index]
                 user.email = df["email"][index]
                 user.username = df["username"][index]
-                user.role = [user_role]
+                #user.role = [user_role]
+                user.role.append(Role.query.filter_by(name="user").first())
                 db.session.add(user)
                 db.session.commit()
                 users = Users.query.all()
@@ -165,3 +165,18 @@ def import_data():
     return redirect(url_for("login.admin_users"))
 
 
+@login.route("/delete/<int:id>")
+@login_required
+def delete_user(id):
+    user_to_delete = Users.query.get_or_404(id)
+    name = None
+    try:
+        db.session.delete(user_to_delete)
+        db.session.commit()
+        flash("User deleted")
+        users = Users.query.order_by(Users.date_added)
+        return redirect(url_for("login.admin_users"))
+    except:
+        flash("There was a problem")
+        users = Users.query.order_by(Users.date_added)
+        return redirect(url_for("login.admin_users"), name=name, users=users)
