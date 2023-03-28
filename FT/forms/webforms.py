@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, FileField
+from wtforms import widgets
+from wtforms import StringField, PasswordField, SubmitField, FileField, SelectMultipleField, BooleanField
 from wtforms.validators import DataRequired, EqualTo
 
 class UserForm(FlaskForm):
@@ -19,7 +20,9 @@ class UpdateUserForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('email', validators=[DataRequired()])
     password_hash = PasswordField("Password", validators=[DataRequired()])
+    role = SelectMultipleField("roles")
     submit = SubmitField("Submit")
+
 
 class ImportForm(FlaskForm):
     file = FileField("file", validators=[DataRequired()])

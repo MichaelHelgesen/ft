@@ -4,12 +4,28 @@ from FT import db, app
 import flask_excel as excel
 import io
 import pandas as pd
+from functools import wraps
 from FT.models.add_user import Users, Role
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, current_user, logout_user
 import csv
 login = Blueprint('login', __name__, static_folder="static",
                   template_folder="templates")
+
+
+def requires_access_level(logged_user):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            user_role = Role.query.filter_by(name="admin").first()
+            if not user_role in logged_user.role:
+                flash("not authorized")
+                return redirect(url_for('login.user_login'))
+
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
 
 
 @login.route('/login', methods=["GET", "POST"])
@@ -82,7 +98,9 @@ def user_logout():
 
 @login.route("/users", methods=["GET", "POST"])
 @login_required
-def admin_users():
+@requires_access_level(current_user)
+def admin_users(): 
+    users = Users.query.all()
     form = webforms.ImportForm()
     users = Users.query.all()
     user_role = Role.query.filter_by(name="user").first()
@@ -104,8 +122,7 @@ def admin_users():
                 users = Users.query.all()
         flash("imported")
         return render_template('users.html', users=users, form=form)
-       
-    return render_template("users.html", users=users, form=form)
+    return render_template("users.html", form=form, users=users)
 
 
 @login.route("/upload")
@@ -120,8 +137,17 @@ def admin_import():
 def admin_user_update(id):
     user = Users.query.get_or_404(id)
     form = webforms.UpdateUserForm()
+    roles = Role.query.all()
+    form.role.choices = [(roles.id, roles.name) for roles in roles]
+    print(roles)
     if request.method == "POST":
         password = request.form["password_hash"]
+        user_roles = request.form.getlist('hello')
+        user.role = []
+        for x in user_roles:
+            if Role.query.filter_by(id = x).first():
+                user.role.append(Role.query.filter_by(id = x).first())
+
         if password:
             hashed_pw = generate_password_hash(password, "sha256")
             user.password_hash = hashed_pw
@@ -136,7 +162,7 @@ def admin_user_update(id):
             flash("Error")
             return render_template("update_user.html", form=form, user=user)
     else:
-        return render_template("update_user.html", form=form, user=user)
+        return render_template("update_user.html", form=form, user=user, roles=roles)
 
 @login.route('/download', methods=['GET'])
 def download_data():

@@ -20,6 +20,19 @@
     {{ form.username.label }}
     {{ form.username(value = user.username) }}
     <br />
+    {{ form.role.label }}
+    {{ form.role(class="form-select") }}
+    <br />
+     <div class="test">
+    {% for role in roles %}
+    <div class="form-check">
+        <input class="form-check-input" name="hello" type="checkbox" value="{{ role.id }}" id="{{role.name}}" {% if role in user.role %}checked{% endif %}>
+        <label class="form-check-label" for="{{role.name}}">
+          {{ role.name }}
+        </label>
+      </div>
+    {% endfor %}
+    </div> 
     {{ form.password_hash.label }}
     {{ form.password_hash }}
     <br />
