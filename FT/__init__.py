@@ -16,16 +16,18 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///ft.db"
 # initialize the app with the extension
 db.init_app(app)
 
+# Definisjon av standard loginside
 login_manager = LoginManager()
 login_manager.login_view = 'login.user_login'
 login_manager.init_app(app)
 
-
-
+#Importer modeller for å opprette database
 from .models.add_user import Users
+from .models.projects import Project
+from .models.apartments import Apartments
 
 admin = Admin(app)
-
+# Admin-panel /admin
 class UserView(ModelView):
     column_hide_backrefs = False
     can_export = True
@@ -33,7 +35,6 @@ class UserView(ModelView):
     column_auto_select_related = True
     column_list = ("name", 'username', "email", "role", "date_added")
     
-
 admin.add_view(UserView(Users, db.session))
 
 @login_manager.user_loader

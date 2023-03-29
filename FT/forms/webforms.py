@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import widgets
-from wtforms import StringField, PasswordField, SubmitField, FileField, SelectMultipleField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, FileField, SelectMultipleField, BooleanField, SelectField
 from wtforms.validators import DataRequired, EqualTo
 
 class UserForm(FlaskForm):
@@ -26,4 +26,18 @@ class UpdateUserForm(FlaskForm):
 
 class ImportForm(FlaskForm):
     file = FileField("file", validators=[DataRequired()])
+    submit = SubmitField("Submit")
+
+class ProjectForm(FlaskForm):
+    name = StringField('name', validators=[DataRequired()])
+    submit = SubmitField("Submit")
+
+class AddApartmentForm(FlaskForm):
+    apartment_id = StringField('apartment_id', validators=[DataRequired()])
+    project = SelectField('projects') 
+    submit = SubmitField("Submit")
+
+class UpdateApartmentForm(FlaskForm):
+    apartment_id = StringField('apartment_id', validators=[DataRequired()])
+    project = SelectField('projects') 
     submit = SubmitField("Submit")

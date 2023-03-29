@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content%}
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>{{ message }}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{{ sample_data }}
+<h2>Projects</h2>
+{% for project in projects %}
+    <a href="{{url_for('projects.project_edit', slug=project.slug)}}">{{ project.name.title() }}</a>
+{% endfor %}
+<br/><br/>
+<h3>Legg til prosjekt</h3>
+<form action="/projects" method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.name.label }}
+    {{ form.name }}
+    <br />
+    {{ form.submit }}
+</form>
+{% endblock %}

@@ -29,6 +29,12 @@
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="{{ url_for('login.admin_import')}}">Import</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{{ url_for('projects.project_list')}}">Projects</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{{ url_for('apartments.apartments_list')}}">Apartments</a>
+                </li>
                 {% endif %}
             </ul>
             <form class="d-flex" role="search" method="POST" action="">
