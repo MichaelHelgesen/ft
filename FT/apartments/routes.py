@@ -6,7 +6,7 @@ import io
 import pandas as pd
 from functools import wraps
 from FT.models.apartments import Apartments
-from FT.models.projects import Projects
+from FT.models.projects import Project
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, current_user, logout_user
 import csv
@@ -23,24 +23,29 @@ def str_to_slug(string, delimeter = "-"):
 
 @apartments.route('/apartments', methods=["GET", "POST"])
 def apartments_list():
-    form = webforms.AddApartmentForm()
     apartments = Apartments.query.all()
-    projects = Projects.query.all()
+    form = webforms.AddApartmentForm()
+    projects = Project.query.all()
+    form.project.choices = [(project.id, project.name.title()) for project in projects]
     if request.method == "POST":
         if form.validate_on_submit():
             apartment_id = form.apartment_id.data.upper()  
             apartment = Apartments.query.filter_by(apartment_id = apartment_id).first()
             if apartment is None:
                 new_apartment = Apartments()
-                new_apartment.id = apartment_id
+                new_apartment.apartment_id = apartment_id
                 new_apartment.slug = str_to_slug(apartment_id)
+                new_apartment.project_id = form.project.data
+                print(new_apartment.apartment_id)
+                print(new_apartment.slug)
+                print(new_apartment.project_id)
                 db.session.add(new_apartment)
                 db.session.commit()
                 form.apartment_id.data = ""
-                flash("project added")
+                flash("apartment added")
                 return redirect(url_for("apartments.apartments_list"))
             else:
-                flash("project name already exists")
+                flash("apartment name already exists")
                 return redirect(url_for("apartments.apartments_list"))
         else:
             flash("Something went wrong")
@@ -49,8 +54,28 @@ def apartments_list():
 
 
 @apartments.route('/apartments/<string:slug>', methods=["GET", "POST"])
-def apratment_edit(slug):
-    project = Projects.query.filter_by(slug=slug).first()
-    name = project.name
-    return render_template("apartments_edit.html", name=name.title())
+def apartment_edit(slug):
+    apartment = Apartments.query.filter_by(slug=slug).first()
+    id = apartment.apartment_id.upper()
+    projects = Project.query.all()
+    current_apartment_project = Project.query.filter_by(id = apartment.project_id).first()
+    form = webforms.UpdateApartmentForm()
+    form.project.choices = [(project.id, project.name.title()) for project in projects]
+    form.project.default = current_apartment_project.id
+    form.project.process([])
+    form.apartment_id.data = id
+    if request.method == "POST":
+        if form.validate_on_submit():
+                apartment.apartment_id = request.form["apartment_id"].upper()
+                apartment.slug = str_to_slug(request.form["apartment_id"])
+                apartment.project_id = request.form["project"]
+                db.session.commit()
+                flash("User updated!")
+                return redirect(url_for("apartments.apartments_list"))
+                
+        else:
+            flash("Error")
+            return redirect(url_for("apartments.apartments_list"))
+    
+    return render_template("apartment_edit.html", id=id, form=form, slug=slug)
 

@@ -10,7 +10,7 @@
 {{ sample_data }}
 <h2>Apartments</h2>
 {% for apartment in apartments %}
-    <a href="{{url_for('apartments.apartment_edit', slug=apartment.slug)}}">{{ apartment.name.title() }}</a>
+    <a href="{{url_for('apartments.apartment_edit', slug=apartment.slug)}}">{{ apartment.apartment_id.title() }}</a>
 {% endfor %}
 <br/><br/>
 <h3>Legg til leilighet</h3>
@@ -19,7 +19,8 @@
     {{ form.apartment_id.label }}
     {{ form.apartment_id }}
     <br />
-    
+    {{ form.project.label }}
+    {{ form.project }}
     <br />
     {{ form.submit }}
 </form>

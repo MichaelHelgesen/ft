@@ -139,7 +139,6 @@ def admin_user_update(id):
     form = webforms.UpdateUserForm()
     roles = Role.query.all()
     form.role.choices = [(roles.id, roles.name) for roles in roles]
-    print(roles)
     if request.method == "POST":
         password = request.form["password_hash"]
         user_roles = request.form.getlist('hello')
