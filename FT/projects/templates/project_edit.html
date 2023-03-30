@@ -9,5 +9,11 @@
 {% endfor %}
 {{ sample_data }}
 <h2>Edit Project {{ name }}</h2>
-
+<form action="/projects/{{ slug }}" method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.name.label }}
+    {{ form.name }}
+    <br />
+    {{ form.submit }}
+</form>
 {% endblock %}

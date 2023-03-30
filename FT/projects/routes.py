@@ -49,6 +49,19 @@ def project_list():
 @projects.route('/projects/<string:slug>', methods=["GET", "POST"])
 def project_edit(slug):
     project = Project.query.filter_by(slug=slug).first()
+    form = webforms.UpdateProjectForm()
+    form.name.data = project.name.title()
     name = project.name
-    return render_template("project_edit.html", name=name.title())
+    if request.method == "POST":
+        if form.validate_on_submit():
+                project.name = request.form["name"].upper()
+                project.slug = str_to_slug(request.form["name"])
+                db.session.commit()
+                flash("Project updated!")
+                return redirect(url_for("projects.project_list"))   
+        else:
+            flash("Error")
+            return redirect(url_for("projects.project_list"))
+        
+    return render_template("project_edit.html", name=name.title(), slug=slug, form=form)
 

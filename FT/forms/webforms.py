@@ -32,6 +32,10 @@ class ProjectForm(FlaskForm):
     name = StringField('name', validators=[DataRequired()])
     submit = SubmitField("Submit")
 
+class UpdateProjectForm(FlaskForm):
+    name = StringField('name', validators=[DataRequired()])
+    submit = SubmitField("Submit")
+
 class AddApartmentForm(FlaskForm):
     apartment_id = StringField('apartment_id', validators=[DataRequired()])
     project = SelectField('projects')
