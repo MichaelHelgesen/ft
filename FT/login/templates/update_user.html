@@ -20,9 +20,6 @@
     {{ form.username.label }}
     {{ form.username(value = user.username) }}
     <br />
-    {{ form.role.label }}
-    {{ form.role(class="form-select") }}
-    <br />
      <div class="test">
     {% for role in roles %}
     <div class="form-check">
@@ -33,6 +30,9 @@
       </div>
     {% endfor %}
     </div> 
+    {{ form.apartment.label }}
+    {{ form.apartment }}
+    <br />
     {{ form.password_hash.label }}
     {{ form.password_hash }}
     <br />

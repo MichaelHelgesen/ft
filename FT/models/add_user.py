@@ -19,6 +19,7 @@ class Users(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     role = db.relationship("Role", secondary=roles_users,
                            backref=db.backref('user', lazy='dynamic'))
+    apartment_id = db.Column(db.Integer, db.ForeignKey("apartments.id"))
     
     #def __init__(self, id, name, username, email, date_added, password_hash, role):
         #self.id = id

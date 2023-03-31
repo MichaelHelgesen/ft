@@ -1,14 +1,15 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, request, jsonify
+from flask import Blueprint, render_template, flash, redirect, url_for, request
 from FT.forms import webforms
 from FT import db, app
 import flask_excel as excel
-import io
 import pandas as pd
 from functools import wraps
 from FT.models.add_user import Users, Role
+from FT.models.apartments import Apartments
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, current_user, logout_user
-import csv
+
+
 login = Blueprint('login', __name__, static_folder="static",
                   template_folder="templates")
 
@@ -138,7 +139,16 @@ def admin_user_update(id):
     user = Users.query.get_or_404(id)
     form = webforms.UpdateUserForm()
     roles = Role.query.all()
-    form.role.choices = [(roles.id, roles.name) for roles in roles]
+    apartments = Apartments.query.all()
+    current_apartment = Apartments.query.filter_by(id = user.apartment_id).first()
+    form.apartment.choices = [(apartments.id, apartments.apartment_id.title()) for apartments in apartments]
+    
+    if current_apartment:
+        form.apartment.default = current_apartment.id
+        form.apartment.process([])
+    else:
+        form.apartment.choices.insert(0,("", "Velg leilighet"))
+    #form.role.choices = [(roles.id, roles.name) for roles in roles]
     if request.method == "POST":
         password = request.form["password_hash"]
         user_roles = request.form.getlist('hello')
@@ -153,6 +163,7 @@ def admin_user_update(id):
             user.name = request.form["name"]
             user.email = request.form["email"]
             user.username = request.form["username"]
+            user.apartment_id = request.form["apartment"]
         try:
             db.session.commit()
             flash("User updated!")

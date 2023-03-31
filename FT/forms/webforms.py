@@ -21,8 +21,8 @@ class UpdateUserForm(FlaskForm):
     email = StringField('email', validators=[DataRequired()])
     password_hash = PasswordField("Password", validators=[DataRequired()])
     role = SelectMultipleField("roles")
+    apartment = SelectField('apartment')
     submit = SubmitField("Submit")
-
 
 class ImportForm(FlaskForm):
     file = FileField("file", validators=[DataRequired()])
