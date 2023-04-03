@@ -20,7 +20,7 @@ class Users(UserMixin, db.Model):
     role = db.relationship("Role", secondary=roles_users,
                            backref=db.backref('user', lazy='dynamic'))
     apartment_id = db.Column(db.Integer, db.ForeignKey("apartments.id"))
-    apartment = db.relationship("Apartments", backref=db.backref("users", lazy="dynamic"))
+    #apartment = db.relationship("Apartments", backref=db.backref("users", lazy="dynamic"))
     #apartment_id = db.relationship("Apartments", uselist=False, backref="users")
     
     #def __init__(self, id, name, username, email, date_added, password_hash, role):
