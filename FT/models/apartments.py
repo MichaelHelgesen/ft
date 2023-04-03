@@ -17,3 +17,5 @@ class Apartments(HasSlug, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     apartment_id = db.Column(db.String(200), nullable=False)
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    #apartmentid = db.Column(db.Integer, db.ForeignKey("users.id"))
+    #users = db.relationship("Users")

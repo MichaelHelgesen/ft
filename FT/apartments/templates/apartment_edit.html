@@ -8,7 +8,7 @@
 </div>
 {% endfor %}
 {{ sample_data }}
-<h2>Edit Apartment {{ id }}</h2>
+<h2>Edit Apartment {{ apartment_id }}</h2>
 <form action="/apartments/{{ slug }}" method="POST">
     {{ form.hidden_tag() }}
     {{ form.apartment_id.label }}
@@ -19,4 +19,5 @@
     <br />
     {{ form.submit }}
 </form>
+<a href="{{url_for('apartments.delete_apartment', id=id)}}">Delete apartment</a>
 {% endblock %}

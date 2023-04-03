@@ -99,7 +99,7 @@ def user_logout():
 
 @login.route("/users", methods=["GET", "POST"])
 @login_required
-@requires_access_level(current_user)
+#@requires_access_level(current_user)
 def admin_users(): 
     users = Users.query.all()
     form = webforms.ImportForm()

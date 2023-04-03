@@ -56,7 +56,8 @@ def apartments_list():
 @apartments.route('/apartments/<string:slug>', methods=["GET", "POST"])
 def apartment_edit(slug):
     apartment = Apartments.query.filter_by(slug=slug).first()
-    id = apartment.apartment_id.upper()
+    apartment_id = apartment.apartment_id.upper()
+    id = apartment.id
     projects = Project.query.all()
     current_apartment_project = Project.query.filter_by(id = apartment.project_id).first()
     form = webforms.UpdateApartmentForm()
@@ -77,5 +78,17 @@ def apartment_edit(slug):
             flash("Error")
             return redirect(url_for("apartments.apartments_list"))
     
-    return render_template("apartment_edit.html", id=id, form=form, slug=slug)
+    return render_template("apartment_edit.html", apartment_id=apartment_id, id=id, form=form, slug=slug)
 
+@apartments.route("/apartments/delete/<int:id>")
+@login_required
+def delete_apartment(id):
+    apartment_to_delete = Apartments.query.get_or_404(id)
+    try:
+        db.session.delete(apartment_to_delete)
+        db.session.commit()
+        flash("Apartment deleted")
+        return redirect(url_for("apartments.apartments_list"))
+    except:
+        flash("There was a problem")
+        return redirect(url_for("apartments.apartments_list"))
