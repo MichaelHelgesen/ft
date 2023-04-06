@@ -16,3 +16,4 @@ class HasSlug:
 class Project(HasSlug, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
+    apartments = db.relationship('Apartments', backref='project')

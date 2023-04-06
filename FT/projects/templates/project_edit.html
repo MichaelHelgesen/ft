@@ -16,4 +16,5 @@
     <br />
     {{ form.submit }}
 </form>
+<a href="{{url_for('projects.delete_project', id=id)}}">Delete project</a>
 {% endblock %}

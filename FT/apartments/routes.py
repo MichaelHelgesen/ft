@@ -24,9 +24,16 @@ def str_to_slug(string, delimeter = "-"):
 @apartments.route('/apartments', methods=["GET", "POST"])
 def apartments_list():
     apartments = Apartments.query.all()
-    form = webforms.AddApartmentForm()
     projects = Project.query.all()
-    form.project.choices = [(project.id, project.name.title()) for project in projects]
+    if projects:
+        form = webforms.AddApartmentForm()
+        form.project.choices = [(project.id, project.name.title()) for project in projects]
+        form.project.choices.insert(0, ("", "Velg prosjekt"))
+    
+    else:
+        form = webforms.AddApartmentNoProjectForm()
+    
+    #form.project.choices = [(project.id, project.name.title()) for project in projects]
     if request.method == "POST":
         if form.validate_on_submit():
             apartment_id = form.apartment_id.data.upper()  
@@ -35,10 +42,8 @@ def apartments_list():
                 new_apartment = Apartments()
                 new_apartment.apartment_id = apartment_id
                 new_apartment.slug = str_to_slug(apartment_id)
-                new_apartment.project_id = form.project.data
-                print(new_apartment.apartment_id)
-                print(new_apartment.slug)
-                print(new_apartment.project_id)
+                if projects:
+                    new_apartment.project_id = form.project.data
                 db.session.add(new_apartment)
                 db.session.commit()
                 form.apartment_id.data = ""
@@ -50,7 +55,10 @@ def apartments_list():
         else:
             flash("Something went wrong")
             return render_template("apartments.html", form=form)
-    return render_template("apartments.html", form=form, apartments=apartments, projects=projects)
+    if projects:
+        return render_template("apartments.html", form=form, apartments=apartments, projects=projects)
+    return render_template("apartments.html", form=form, apartments=apartments)
+
 
 
 @apartments.route('/apartments/<string:slug>', methods=["GET", "POST"])
@@ -62,8 +70,12 @@ def apartment_edit(slug):
     current_apartment_project = Project.query.filter_by(id = apartment.project_id).first()
     form = webforms.UpdateApartmentForm()
     form.project.choices = [(project.id, project.name.title()) for project in projects]
-    form.project.default = current_apartment_project.id
-    form.project.process([])
+    if current_apartment_project:
+        form.project.choices.insert(0,("", "Ingen prosjekt valgt"))
+        form.project.default = current_apartment_project.id
+        form.project.process([])
+    else:
+        form.project.choices.insert(0,("", "Ingen prosjekt valgt"))
     form.apartment_id.data = id
     if request.method == "POST":
         if form.validate_on_submit():
@@ -78,7 +90,7 @@ def apartment_edit(slug):
             flash("Error")
             return redirect(url_for("apartments.apartments_list"))
     
-    return render_template("apartment_edit.html", apartment_id=apartment_id, id=id, form=form, slug=slug)
+    return render_template("apartment_edit.html", apartment_id=apartment_id, id=id, form=form, slug=slug, projects=projects)
 
 @apartments.route("/apartments/delete/<int:id>")
 @login_required

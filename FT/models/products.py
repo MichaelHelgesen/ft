@@ -3,6 +3,7 @@ from datetime import datetime
 from flask_login import UserMixin
 from sqlalchemy.orm import declarative_mixin
 
+
 @declarative_mixin
 class HasSlug:
     slug_target_column = "name"
@@ -13,8 +14,5 @@ class HasSlug:
     )
 
 
-class Apartments(HasSlug, db.Model):
+class Products(HasSlug, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    apartment_id = db.Column(db.String(200), nullable=False)
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
-    users = db.relationship('Users', backref='apartments')

@@ -51,6 +51,7 @@ def project_edit(slug):
     project = Project.query.filter_by(slug=slug).first()
     form = webforms.UpdateProjectForm()
     form.name.data = project.name.title()
+    id = project.id
     name = project.name
     if request.method == "POST":
         if form.validate_on_submit():
@@ -63,5 +64,17 @@ def project_edit(slug):
             flash("Error")
             return redirect(url_for("projects.project_list"))
         
-    return render_template("project_edit.html", name=name.title(), slug=slug, form=form)
+    return render_template("project_edit.html", name=name.title(), slug=slug, form=form, id=id)
 
+@projects.route("/project/delete/<int:id>")
+@login_required
+def delete_project(id):
+    project_to_delete = Project.query.get_or_404(id)
+    try:
+        db.session.delete(project_to_delete)
+        db.session.commit()
+        flash("Project deleted")
+        return redirect(url_for("projects.project_list"))
+    except:
+        flash("There was a problem")
+        return redirect(url_for("project.project_list"))

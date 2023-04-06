@@ -19,8 +19,10 @@
     {{ form.apartment_id.label }}
     {{ form.apartment_id }}
     <br />
+    {% if projects %}
     {{ form.project.label }}
     {{ form.project }}
+    {% endif %}
     <br />
     {{ form.submit }}
 </form>

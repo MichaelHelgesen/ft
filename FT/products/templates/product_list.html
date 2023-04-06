@@ -7,19 +7,24 @@
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {% endfor %}
-{{ sample_data }}
-<h2>Edit Apartment {{ apartment_id }}</h2>
-<form action="/apartments/{{ slug }}" method="POST">
+<h2>products</h2>
+{% if rows %} 
+{% for rows in rows %}
+    <div>
+        {{ rows["NRF"] }} - {{ rows["Produktnavn"] }}
+    </div>
+{% endfor %}
+{% else %}
+<p>No products</p>
+{% endif %}
+<br/><br/>
+<h3>Importer produkter</h3>
+<form action="#" method="POST" enctype=multipart/form-data>
     {{ form.hidden_tag() }}
-    {{ form.apartment_id.label }}
-    {{ form.apartment_id }}
-    <br />
-    {% if projects %}
-    {{ form.project.label }}
-    {{ form.project }}
-    {% endif %}
-    <br />
+    {{ form.file.label }}
+    {{ form.file }}
     {{ form.submit }}
 </form>
-<a href="{{url_for('apartments.delete_apartment', id=id)}}">Delete apartment</a>
+<br /><br />
+<h3>Eksporter produkter</h3>
 {% endblock %}

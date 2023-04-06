@@ -7,11 +7,14 @@
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {% endfor %}
-{{ sample_data }}
 <h2>Projects</h2>
+{% if projects %}
 {% for project in projects %}
     <a href="{{url_for('projects.project_edit', slug=project.slug)}}">{{ project.name.title() }}</a>
 {% endfor %}
+{% else %}
+<p>No projects</p>
+{% endif %}
 <br/><br/>
 <h3>Legg til prosjekt</h3>
 <form action="/projects" method="POST">
