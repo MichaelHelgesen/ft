@@ -6,7 +6,7 @@ import flask_excel as excel
 import pandas as pd
 import sqlite3
 from functools import wraps
-from FT.models.products import Products
+#from FT.models.products import Products
 from FT.models.apartments import Apartments
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, current_user, logout_user
@@ -46,21 +46,27 @@ def product_list():
     
     return render_template("product_list.html", form=form, rows=rows)
 
-""" @products.route('/products/download', methods=['GET'])
+@products.route('/products/download', methods=['GET'])
 def download_data():
-    users = Users.query.all()
-    user_id = []
-    user_names = []
-    user_emails = []
-    user_username = []
-    for users in users:
-        user_id.append(users.id)
-        user_names.append(users.name)
-        user_emails.append(users.email)
-        user_username.append(users.username)
-        print(users.role)
+    #products = products.query.all()
+    con = sqlite3.connect("instance/ft.db")
+    con.row_factory = sqlite3.Row
+
+    cur = con.cursor()
+    cur.execute("select * from products")
+    products = cur.fetchall()
+    #rows = cur.fetchall()
+    print(products)
+    #print(products)
+    product_nrf = []
+    product_names = []
+    product_emails = []
+    product_username = []
+    for products in products:
+        product_nrf.append(products.nrf)
+        product_names.append(products.Produktnavn)
     excel.init_excel(app)
     extension_type = "xls"
     filename = "test123" + "." + extension_type
-    d = {'id': user_id, "name": user_names, "email": user_emails, "username": user_username}
-    return excel.make_response_from_dict(d, file_type=extension_type, file_name=filename) """
+    d = {'nrf': product_nrf, "Produktnavn": product_names}
+    return excel.make_response_from_dict(d, file_type=extension_type, file_name=filename)

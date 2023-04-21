@@ -187,7 +187,7 @@ def download_data():
         user_names.append(users.name)
         user_emails.append(users.email)
         user_username.append(users.username)
-        print(users.role)
+        #print(users.role)
     excel.init_excel(app)
     extension_type = "xls"
     filename = "test123" + "." + extension_type
