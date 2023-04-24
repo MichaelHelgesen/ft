@@ -11,7 +11,7 @@
 {% if rows %} 
 {% for rows in rows %}
     <div>
-        {{ rows["NRF"] }} - {{ rows["Produktnavn"] }}
+        {{ rows["NRF"] }} - <a href="{{url_for('products.product_edit')}}">{{ rows["Produktnavn"] }}</a>
     </div>
 {% endfor %}
 {% else %}

@@ -6,7 +6,7 @@ import flask_excel as excel
 import pandas as pd
 import sqlite3
 from functools import wraps
-#from FT.models.products import Products
+from FT.models.products import Products
 from FT.models.apartments import Apartments
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, current_user, logout_user
@@ -17,9 +17,34 @@ products = Blueprint('products', __name__, static_folder="static",
 
 @products.route("/products", methods=["GET", "POST"])
 def product_list():
+    products = Products.query.all()
     form = webforms.ImportForm()
-    
-    con = sqlite3.connect("instance/ft.db")
+    if request.method == "POST":
+        #df = pd.read_csv(request.files.get('file'))
+        df = pd.read_excel(request.files.get('file'))
+        
+        for index in df.index:
+            check_product = Products.query.filter_by(nrf = df["nrf"][index]).first()
+            if check_product is None:
+                product = Products()
+                product.nrf = df["NRF"][index]
+                product.leverandor = df["Leverandør"][index]
+                product.hovedkategori = df["Hovedkategori"][index]
+                product.underkategori = df["Underkategori"][index]
+                product.kategori = df["Kategori"][index]
+                product.produktnavn = df["Produktnavn"][index]
+                product.beskrivelse = df["Beskrivelse"][index]
+                product.mal = df["Mål"][index]
+                product.farge = df["Farge"][index]
+                product.enhet = df["Enhet"][index]
+                db.session.add(product)
+                db.session.commit()
+                products = Products.query.all()
+        flash("imported")
+        return render_template('users.html', products=products, form=form)
+    return render_template("users.html", form=form, products=products)
+
+    """ con = sqlite3.connect("instance/ft.db")
     con.row_factory = sqlite3.Row
     
 
@@ -42,31 +67,39 @@ def product_list():
                 return redirect(url_for("products.product_list"))
         else: 
             flash("Error")
-            return redirect(url_for("products.product_list"))
+            return redirect(url_for("products.product_list")) """
     
-    return render_template("product_list.html", form=form, rows=rows)
+    #return render_template("product_list.html", form=form, rows=rows)
 
 @products.route('/products/download', methods=['GET'])
 def download_data():
     #products = products.query.all()
+    
     con = sqlite3.connect("instance/ft.db")
-    con.row_factory = sqlite3.Row
-
+    
+    con.row_factory = sqlite3.Row #Gir oss navn på kolonner 
     cur = con.cursor()
     cur.execute("select * from products")
     products = cur.fetchall()
-    #rows = cur.fetchall()
-    print(products)
-    #print(products)
+
     product_nrf = []
     product_names = []
-    product_emails = []
-    product_username = []
-    for products in products:
-        product_nrf.append(products.nrf)
-        product_names.append(products.Produktnavn)
+
+    for product in products:
+        print(dict(product)["NRF"])
+        product_nrf.append(dict(product)["NRF"])
+        product_names.append(dict(product)["Produktnavn"])
+
+    print(product_nrf)
+
     excel.init_excel(app)
     extension_type = "xls"
     filename = "test123" + "." + extension_type
     d = {'nrf': product_nrf, "Produktnavn": product_names}
     return excel.make_response_from_dict(d, file_type=extension_type, file_name=filename)
+
+@products.route('/products/2', methods=["GET", "POST"])
+def product_edit():
+    product = "heis"    
+    return render_template("product.html")
+

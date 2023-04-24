@@ -25,6 +25,7 @@ login_manager.init_app(app)
 from .models.add_user import Users
 from .models.projects import Project
 from .models.apartments import Apartments
+from .models.products import Products
 
 admin = Admin(app)
 # Admin-panel /admin
