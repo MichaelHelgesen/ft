@@ -41,8 +41,8 @@ def product_list():
                 db.session.commit()
                 products = Products.query.all()
         flash("imported")
-        return render_template('users.html', products=products, form=form)
-    return render_template("users.html", form=form, products=products)
+        return render_template('product_list.html', products=products, form=form)
+    return render_template("product_list.html", form=form, products=products)
 
     """ con = sqlite3.connect("instance/ft.db")
     con.row_factory = sqlite3.Row
