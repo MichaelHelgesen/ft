@@ -5,6 +5,8 @@ from FT import db, app
 import flask_excel as excel
 import pandas as pd
 import sqlite3
+import os
+import urllib
 from functools import wraps
 from FT.models.products import Products
 from FT.models.apartments import Apartments
@@ -12,8 +14,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, current_user, logout_user
 
 
-products = Blueprint('products', __name__, static_folder="static",
-                  template_folder="templates")
+products = Blueprint('products', __name__, static_folder="static", static_url_path='/', template_folder="templates")
 
 @products.route("/products", methods=["GET", "POST"])
 def product_list():
@@ -27,7 +28,7 @@ def product_list():
             check_product = Products.query.filter_by(nrf = df["NRF"][index]).first()
             if check_product is None:
                 product = Products()
-                product.slug = str(df["NRF"][index]) + "-" + df["Produktnavn"][index]
+                product.slug = urllib.parse.quote(str(df["NRF"][index]) + "-" + df["Produktnavn"][index].replace('.','').replace(' ','-'))
                 product.nrf = str(df["NRF"][index])
                 product.leverandor = df["Leverandør"][index]
                 product.hovedkategori = df["Hovedkategori"][index]
@@ -104,5 +105,18 @@ def download_data():
 def product_edit(slug):
     product = Products.query.filter_by(slug=slug).first()
     product_id = product.nrf
-    id = product.id
-    return render_template("product.html", product_id=product_id, id=id, slug=slug)
+    image_file = url_for('products.static', filename=str(product_id) + ".jpg")
+    return render_template("product.html", product_id=product_id, id=id, slug=slug, product=product, image_file=image_file)
+
+@products.route("/products/delete/<string:id>")
+@login_required
+def delete_product(id):
+    product_to_delete = Products.query.filter_by(nrf=id).first()
+    try:
+        db.session.delete(product_to_delete)
+        db.session.commit()
+        flash("Product deleted")
+        return redirect(url_for("products.product_list"))
+    except:
+        flash("There was a problem")
+        return redirect(url_for("products.product_list"))

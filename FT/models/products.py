@@ -16,8 +16,8 @@ class HasSlug:
 
 
 class Products(HasSlug, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    nrf = db.Column(db.String)
+    #id = db.Column(db.Integer, primary_key=True)
+    nrf = db.Column(db.String(100), nullable=False, primary_key=True, unique=True)
     leverandor = db.Column(db.String)
     hovedkategori = db.Column(db.String)
     underkategori = db.Column(db.String)

@@ -8,6 +8,38 @@
 </div>
 {% endfor %}
 {{ sample_data }}
-<h2>Edit Product</h2>
 
+
+<h2>{{ product.produktnavn }} - {{ product.farge }}</h2>
+{% if image_file %}
+    <img src="{{ image_file }}" width="200px"/>
+{% endif %}
+{% if product.nrf %}
+    <p>NRF: {{ product.nrf }}</p>
+{% endif %}
+{% if product.leverandor %}
+    <p>Leverandør: {{ product.leverandor }}</p>
+{% endif %}
+{% if product.hovedkategori %}
+    <p>Hovedkategori: {{ product.hovedkategori }}</p>
+{% endif %}
+{% if product.underkategori %}
+    <p>Underkategori: {{ product.underkategori }}</p>
+{% endif %}
+{% if product.kategori %}
+    <p>Mål: {{ product.kategori }}</p>
+{% endif %}
+{% if product.beskrivelse %}
+    <p>Besrkivelse: {{ product.beskrivelse }}</p>
+{% endif %}
+{% if product.mal %}
+    <p>Mål: {{ product.mal }}</p>
+{% endif %}
+{% if product.farge %}
+    <p>Farge: {{ product.farge }}</p>
+{% endif %}
+{% if product.enhet %}
+    <p>Enhet: {{ product.enhet }}</p>
+{% endif %}
+<a href="{{url_for('products.delete_product', id=product.nrf)}}">Delete product</a>
 {% endblock %}

@@ -11,7 +11,7 @@
 {% if products %} 
 {% for product in products %}
     <div>
-        {{ product["nrf"] }} - <a href="{{url_for('products.product_edit', slug=product.slug)}}">{{ product["produktnavn"] }}</a>
+        {{ product["nrf"] }} - <a href="{{url_for('products.product_edit', slug=product.slug)}}">{{ product["produktnavn"] }} - {{ product["farge"]}}</a>
     </div>
 {% endfor %}
 {% else %}
@@ -28,4 +28,12 @@
 <br /><br />
 <h3>Eksporter produkter</h3>
 <a href="{{ url_for('products.download_data') }}">Export products</a>
+<h3>Legg til leilighet</h3>
+<form action="/products" method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.apartment_id.label }}
+    {{ form.apartment_id }}
+    <br />
+    {{ form.submit }}
+</form>
 {% endblock %}
