@@ -24,10 +24,11 @@ def product_list():
         df = pd.read_excel(request.files.get('file'))
         
         for index in df.index:
-            check_product = Products.query.filter_by(nrf = df["nrf"][index]).first()
+            check_product = Products.query.filter_by(nrf = df["NRF"][index]).first()
             if check_product is None:
                 product = Products()
-                product.nrf = df["NRF"][index]
+                product.slug = str(df["NRF"][index]) + "-" + df["Produktnavn"][index]
+                product.nrf = str(df["NRF"][index])
                 product.leverandor = df["Leverandør"][index]
                 product.hovedkategori = df["Hovedkategori"][index]
                 product.underkategori = df["Underkategori"][index]
@@ -96,10 +97,12 @@ def download_data():
     extension_type = "xls"
     filename = "test123" + "." + extension_type
     d = {'nrf': product_nrf, "Produktnavn": product_names}
+
     return excel.make_response_from_dict(d, file_type=extension_type, file_name=filename)
 
-@products.route('/products/2', methods=["GET", "POST"])
-def product_edit():
-    product = "heis"    
-    return render_template("product.html")
-
+@products.route('/products/<string:slug>', methods=["GET", "POST"])
+def product_edit(slug):
+    product = Products.query.filter_by(slug=slug).first()
+    product_id = product.nrf
+    id = product.id
+    return render_template("product.html", product_id=product_id, id=id, slug=slug)

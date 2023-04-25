@@ -8,10 +8,10 @@
 </div>
 {% endfor %}
 <h2>products</h2>
-{% if rows %} 
-{% for rows in rows %}
+{% if products %} 
+{% for product in products %}
     <div>
-        {{ rows["NRF"] }} - <a href="{{url_for('products.product_edit')}}">{{ rows["Produktnavn"] }}</a>
+        {{ product["nrf"] }} - <a href="{{url_for('products.product_edit', slug=product.slug)}}">{{ product["produktnavn"] }}</a>
     </div>
 {% endfor %}
 {% else %}

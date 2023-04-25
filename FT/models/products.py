@@ -7,7 +7,7 @@ from sqlalchemy.orm import declarative_mixin
 
 @declarative_mixin
 class HasSlug:
-    slug_target_column = "nrf" + "-" + "produktnavn"
+    #slug_target_column = "nrf" + "-" + "produktnavn"
     slug = db.Column(
         db.String,
         unique=True,
@@ -17,7 +17,7 @@ class HasSlug:
 
 class Products(HasSlug, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    nrf = db.Column(db.Text)
+    nrf = db.Column(db.String)
     leverandor = db.Column(db.String)
     hovedkategori = db.Column(db.String)
     underkategori = db.Column(db.String)
