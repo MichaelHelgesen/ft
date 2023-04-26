@@ -25,14 +25,16 @@ def str_to_slug(string, delimeter = "-"):
 def apartments_list():
     apartments = Apartments.query.all()
     projects = Project.query.all()
+
     if projects:
         form = webforms.AddApartmentForm()
         form.project.choices = [(project.id, project.name.title()) for project in projects]
         form.project.choices.insert(0, ("", "Velg prosjekt"))
-    
     else:
         form = webforms.AddApartmentNoProjectForm()
     
+    
+
     #form.project.choices = [(project.id, project.name.title()) for project in projects]
     if request.method == "POST":
         if form.validate_on_submit():

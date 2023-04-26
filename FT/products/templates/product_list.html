@@ -20,20 +20,38 @@
 <br/><br/>
 <h3>Importer produkter</h3>
 <form action="#" method="POST" enctype=multipart/form-data>
-    {{ form.hidden_tag() }}
-    {{ form.file.label }}
-    {{ form.file }}
-    {{ form.submit }}
+    {{ importform.hidden_tag() }}
+    {{ importform.file.label }}
+    {{ importform.file }}
+    {{ importform.submit }}
 </form>
 <br /><br />
 <h3>Eksporter produkter</h3>
 <a href="{{ url_for('products.download_data') }}">Export products</a>
-<h3>Legg til leilighet</h3>
-<form action="/products" method="POST">
-    {{ form.hidden_tag() }}
-    {{ form.apartment_id.label }}
-    {{ form.apartment_id }}
-    <br />
-    {{ form.submit }}
+<br /><br />
+<h3>Legg til produkt</h3>
+<form action="#" method="POST" enctype=multipart/form-data>
+    {{ addform.hidden_tag() }}
+    {{ addform.nrf.label }}
+    {{ addform.nrf }}
+    {{ addform.leverandor.label }}
+    {{ addform.leverandor }}
+    {{ addform.hovedkategori.label }}
+    {{ addform.hovedkategori }}
+    {{ addform.underkategori.label }}
+    {{ addform.underkategori }}
+    {{ addform.kategori.label }}
+    {{ addform.kategori }}
+    {{ addform.produktnavn.label }}
+    {{ addform.produktnavn }}
+    {{ addform.beskrivelse.label }}
+    {{ addform.beskrivelse }}
+    {{ addform.mal.label }}
+    {{ addform.mal }}
+    {{ addform.farge.label }}
+    {{ addform.farge }}
+    {{ addform.enhet.label }}
+    {{ addform.enhet }}
+    {{ addform.submit }}
 </form>
 {% endblock %}

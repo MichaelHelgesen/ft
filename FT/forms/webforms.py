@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import widgets
-from wtforms import StringField, PasswordField, SubmitField, FileField, SelectMultipleField, BooleanField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, FileField, SelectMultipleField, BooleanField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, EqualTo
 
 class UserForm(FlaskForm):
@@ -48,4 +48,17 @@ class AddApartmentNoProjectForm(FlaskForm):
 class UpdateApartmentForm(FlaskForm):
     apartment_id = StringField('apartment_id', validators=[DataRequired()])
     project = SelectField('projects') 
+    submit = SubmitField("Submit")
+
+class AddProductForm(FlaskForm):
+    nrf = StringField('nrf', validators=[DataRequired()])
+    leverandor = StringField('leverandor', validators=[DataRequired()]) 
+    hovedkategori = StringField('hovedkategori', validators=[DataRequired()])
+    underkategori = StringField('underkategori', validators=[DataRequired()])
+    kategori = StringField('kategori', validators=[DataRequired()])
+    produktnavn = StringField('produktnavn', validators=[DataRequired()])
+    beskrivelse = TextAreaField('beskrivelse', validators=[DataRequired()])
+    mal = StringField('mal')
+    farge = StringField('farge')
+    enhet = StringField('enhet')
     submit = SubmitField("Submit")

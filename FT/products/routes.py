@@ -19,32 +19,66 @@ products = Blueprint('products', __name__, static_folder="static", static_url_pa
 @products.route("/products", methods=["GET", "POST"])
 def product_list():
     products = Products.query.all()
-    form = webforms.ImportForm()
+    importform = webforms.ImportForm()
+    addform = webforms.AddProductForm()
+    
     if request.method == "POST":
-        #df = pd.read_csv(request.files.get('file'))
-        df = pd.read_excel(request.files.get('file'))
+        if importform.submit.data and importform.validate():
+            print("importskjema")
+            #df = pd.read_csv(request.files.get('file'))
+            df = pd.read_excel(request.files.get('file'))
+            
+            for index in df.index:
+                check_product = Products.query.filter_by(nrf = df["NRF"][index]).first()
+                if check_product is None:
+                    product = Products()
+                    product.slug = urllib.parse.quote(str(df["NRF"][index]) + "-" + df["Produktnavn"][index].replace('.','').replace(' ','-'))
+                    product.nrf = str(df["NRF"][index])
+                    product.leverandor = df["Leverandør"][index]
+                    product.hovedkategori = df["Hovedkategori"][index]
+                    product.underkategori = df["Underkategori"][index]
+                    product.kategori = df["Kategori"][index]
+                    product.produktnavn = df["Produktnavn"][index]
+                    product.beskrivelse = df["Beskrivelse"][index]
+                    product.mal = df["Mål"][index]
+                    product.farge = df["Farge"][index]
+                    product.enhet = df["Enhet"][index]
+                    db.session.add(product)
+                    db.session.commit()
+                    products = Products.query.all()
+            flash("imported")
+            return render_template('product_list.html', products=products, importform=importform)
         
-        for index in df.index:
-            check_product = Products.query.filter_by(nrf = df["NRF"][index]).first()
-            if check_product is None:
+        if addform.submit.data and addform.validate():
+            print("legg til produkt-skjema")
+            print(Products.query.filter_by(nrf = request.form["nrf"]).first())
+            product_id = request.form["nrf"]
+            check_if_product_exist = Products.query.filter_by(nrf = request.form["nrf"]).first()
+            print(check_if_product_exist)
+            if check_if_product_exist is None:
                 product = Products()
-                product.slug = urllib.parse.quote(str(df["NRF"][index]) + "-" + df["Produktnavn"][index].replace('.','').replace(' ','-'))
-                product.nrf = str(df["NRF"][index])
-                product.leverandor = df["Leverandør"][index]
-                product.hovedkategori = df["Hovedkategori"][index]
-                product.underkategori = df["Underkategori"][index]
-                product.kategori = df["Kategori"][index]
-                product.produktnavn = df["Produktnavn"][index]
-                product.beskrivelse = df["Beskrivelse"][index]
-                product.mal = df["Mål"][index]
-                product.farge = df["Farge"][index]
-                product.enhet = df["Enhet"][index]
+                product.slug = urllib.parse.quote(str(request.form["nrf"]) + "-" + request.form["produktnavn"].replace('.','').replace(' ','-'))
+                product.nrf = str(request.form["nrf"])
+                product.leverandor = request.form["leverandor"]
+                product.hovedkategori = request.form["hovedkategori"]
+                product.underkategori = request.form["underkategori"]
+                product.kategori = request.form["kategori"]
+                product.produktnavn = request.form["produktnavn"]
+                product.beskrivelse = request.form["beskrivelse"]
+                product.mal = request.form["mal"]
+                product.farge = request.form["farge"]
+                product.enhet = request.form["enhet"]
                 db.session.add(product)
                 db.session.commit()
                 products = Products.query.all()
-        flash("imported")
-        return render_template('product_list.html', products=products, form=form)
-    return render_template("product_list.html", form=form, products=products)
+                print("test")
+                flash("product added")
+                return render_template('product_list.html', products=products, importform=importform, addform=addform)
+            else:
+                flash("product already exists")
+                return render_template('product_list.html', products=products, importform=importform, addform=addform)
+    
+    return render_template("product_list.html", importform=importform, products=products, addform=addform)
 
     """ con = sqlite3.connect("instance/ft.db")
     con.row_factory = sqlite3.Row
@@ -120,3 +154,4 @@ def delete_product(id):
     except:
         flash("There was a problem")
         return redirect(url_for("products.product_list"))
+
