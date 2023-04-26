@@ -15,3 +15,4 @@ class HasSlug:
 class Collections(HasSlug, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))

@@ -48,4 +48,7 @@ def collections():
 
 @product_col.route("/collections/<string:slug>", methods=["GET", "POST"])
 def collection(slug):
-    return render_template("collection.html")
+    form = webforms.AddCollection()
+    collection = Collections.query.filter_by(slug=slug).first()
+    form.collection_name.data = collection.name
+    return render_template("collection.html", collection=collection, form=form)

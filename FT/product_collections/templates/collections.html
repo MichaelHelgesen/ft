@@ -10,7 +10,7 @@
 {{ sample_data }}
 <h2>Collections</h2>
 {% for collection in collections %}
-    <a href="{{url_for('product_col.collection', slug=collection.slug)}}">{{ collection.name }}</a>
+    <a href="{{url_for('product_col.collection', slug=collection.slug)}}">{{ collection.name.title() }}</a>
 {% endfor %}
 <br/><br/>
 <h3>Legg til produktpakke</h3>

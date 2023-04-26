@@ -7,6 +7,7 @@ import pandas as pd
 from functools import wraps
 from FT.models.apartments import Apartments
 from FT.models.projects import Project
+from FT.models.collections import Collections
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, current_user, logout_user
 import csv
