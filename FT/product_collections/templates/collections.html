@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content%}
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>{{ message }}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{{ sample_data }}
+<h2>Collections</h2>
+{% for collection in collections %}
+    <a href="{{url_for('product_col.collection', slug=collection.slug)}}">{{ collection.name }}</a>
+{% endfor %}
+<br/><br/>
+<h3>Legg til produktpakke</h3>
+<form action="/collections" method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.collection_name.label }}
+    {{ form.collection_name }}
+    <br />
+    {{ form.submit }}
+</form>
+{% endblock %}
