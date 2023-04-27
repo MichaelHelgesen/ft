@@ -53,6 +53,7 @@ def collection(slug):
     form = webforms.AddCollection()
     addForm = webforms.AddToCollection()
     collection = Collections.query.filter_by(slug=slug).first()
+    product_collection = products_collections.query.all()
     products = Products.query.all()
     projects = Project.query.all()
     print(projects)
@@ -69,18 +70,20 @@ def collection(slug):
     form.collection_name.data = collection.name
     if request.method == "POST":
 
-        if addForm.submit.data and addForm.validate():
-            print("addform")
+        if addForm.submit2.data and addForm.validate():
+            print(addForm.data)
+            flash("Added to collection!")
+            return redirect(request.url)
 
 
         if form.submit.data and form.validate():
-                print("test2")
-                collection.name = request.form["collection_name"].upper()
-                collection.slug = str_to_slug(request.form["collection_name"])
-                collection.project_id = request.form["project"]
-                db.session.commit()
-                flash("Collection updated!")
-                return redirect(url_for("product_col.collections"))
+            print("test2")
+            collection.name = request.form["collection_name"].upper()
+            collection.slug = str_to_slug(request.form["collection_name"])
+            collection.project_id = request.form["project"]
+            db.session.commit()
+            flash("Collection updated!")
+            return redirect(url_for("product_col.collections"))
                 
         else:
             flash("Error")

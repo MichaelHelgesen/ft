@@ -75,4 +75,4 @@ class UpdateCollectionForm(FlaskForm):
 class AddToCollection(FlaskForm):
     product_id = StringField("product_id")
     project_id = StringField("project_id")
-    submit = SubmitField("AddToCollection")
+    submit2 = SubmitField("Add To Collection")

@@ -22,22 +22,45 @@
     <br />
     {{ form.submit }}
 </form>
-<ul style="max-width: 600px;">
-{% for product in products %}
-    <li style="list-style-type:none; background: #ccc; padding: 5px; margin-bottom: 5px;">
-        <div style="display: flex;">
-            <div>
-                <form action="#" method="POST">
-                    {{ addForm.hidden_tag() }}{{ addForm.submit }}
-                    <input type="checkbox" name="mycheckboxes">
-                </form>
-            </div>
-            <div>{{ product.nrf}} - {{ product.produktnavn }} - {{ product.farge }}</div>
-            
-        </div>
-    </li>
-{% endfor %}
-</ul>
+<div style="display: flex">
+    <div>
+        <h3>Tilgjengelige produkter</h3>
+        <ul style="max-width: 600px; margin: 0;">
+            {% for product in products %}
+            <li style="list-style-type:none; background: #ccc; padding: 5px; margin-bottom: 5px;">
+                <div style="display: flex;">
+                    <div>
+                        <form action="#" method="POST">
+                            {{ addForm.hidden_tag() }}{{ addForm.submit2 }}
+                            <input type="checkbox" name="mycheckboxes">
+                        </form>
+                    </div>
+                    <div>{{ product.nrf}} - {{ product.produktnavn }} - {{ product.farge }}</div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div>
+        <h3>Valgte produkter</h3>
+        <ul style="max-width: 600px;">
+            {% for product in products %}
+                <li style="list-style-type:none; background: #ccc; padding: 5px; margin-bottom: 5px;">
+                    <div style="display: flex;">
+                        <div>
+                            <form action="#" method="POST">
+                                {{ addForm.hidden_tag() }}{{ addForm.submit2 }}
+                                <input type="checkbox" name="mycheckboxes">
+                            </form>
+                        </div>
+                        <div>{{ product.nrf}} - {{ product.produktnavn }} - {{ product.farge }}</div>
+                        
+                    </div>
+                </li>
+            {% endfor %}
+            </ul>
+    </div>
+</div>
 <a href="{{url_for('product_col.delete_col', name=collection.name)}}">Delete collection</a>
 <script src="{{url_for('static', filename='js/product_selection.js')}}"></script>
 {% endblock %}
