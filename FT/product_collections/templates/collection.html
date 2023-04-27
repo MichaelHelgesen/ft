@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block content%}
+    {% block content%}
+    
 {% for message in get_flashed_messages() %}
 <div class="alert alert-warning alert-dismissible fade show" role="alert">
     <strong>{{ message }}</strong>
@@ -14,10 +15,29 @@
     {{ form.collection_name.label }}
     {{ form.collection_name }}
     <br />
-    
-    
+    {% if projects %}
+    {{ form.project.label }}
+    {{ form.project }}
+    {% endif %}
     <br />
     {{ form.submit }}
 </form>
-
+<ul style="max-width: 600px;">
+{% for product in products %}
+    <li style="list-style-type:none; background: #ccc; padding: 5px; margin-bottom: 5px;">
+        <div style="display: flex;">
+            <div>
+                <form action="#" method="POST">
+                    {{ addForm.hidden_tag() }}{{ addForm.submit }}
+                    <input type="checkbox" name="mycheckboxes">
+                </form>
+            </div>
+            <div>{{ product.nrf}} - {{ product.produktnavn }} - {{ product.farge }}</div>
+            
+        </div>
+    </li>
+{% endfor %}
+</ul>
+<a href="{{url_for('product_col.delete_col', name=collection.name)}}">Delete collection</a>
+<script src="{{url_for('static', filename='js/product_selection.js')}}"></script>
 {% endblock %}

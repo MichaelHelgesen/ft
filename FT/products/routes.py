@@ -47,11 +47,10 @@ def product_list():
                     db.session.commit()
                     products = Products.query.all()
             flash("imported")
-            return render_template('product_list.html', products=products, importform=importform)
+            return render_template('product_list.html', products=products, importform=importform, addform=addform)
         
         if addform.submit.data and addform.validate():
             print("legg til produkt-skjema")
-            print(Products.query.filter_by(nrf = request.form["nrf"]).first())
             product_id = request.form["nrf"]
             check_if_product_exist = Products.query.filter_by(nrf = request.form["nrf"]).first()
             print(check_if_product_exist)
@@ -71,7 +70,6 @@ def product_list():
                 db.session.add(product)
                 db.session.commit()
                 products = Products.query.all()
-                print("test")
                 flash("product added")
                 return render_template('product_list.html', products=products, importform=importform, addform=addform)
             else:
@@ -122,9 +120,9 @@ def download_data():
     product_names = []
 
     for product in products:
-        print(dict(product)["NRF"])
-        product_nrf.append(dict(product)["NRF"])
-        product_names.append(dict(product)["Produktnavn"])
+        print(dict(product)["nrf"])
+        product_nrf.append(dict(product)["nrf"])
+        product_names.append(dict(product)["produktnavn"])
 
     print(product_nrf)
 

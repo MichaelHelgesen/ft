@@ -9,6 +9,9 @@ import os
 import urllib
 from functools import wraps
 from FT.models.collections import Collections
+from FT.models.projects import Project
+from FT.models.products import Products
+from FT.models.products_collections import products_collections
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, current_user, logout_user
 import re
@@ -26,7 +29,6 @@ def str_to_slug(string, delimeter = "-"):
 def collections():
     form = webforms.AddCollection()
     collections = Collections.query.all()
-
     if request.method == "POST":
         if form.validate_on_submit():
             collection_id = form.collection_name.data.upper()  
@@ -49,6 +51,52 @@ def collections():
 @product_col.route("/collections/<string:slug>", methods=["GET", "POST"])
 def collection(slug):
     form = webforms.AddCollection()
+    addForm = webforms.AddToCollection()
     collection = Collections.query.filter_by(slug=slug).first()
+    products = Products.query.all()
+    projects = Project.query.all()
+    print(projects)
+    current_collection_project = Project.query.filter_by(id = collection.project_id).first()
+    #updateForm = webforms.UpdateCollectionForm()
+    form.project.choices = [(project.id, project.name.title()) for project in projects]
+    if current_collection_project:
+        form.project.choices.insert(0,("", "Ingen prosjekt valgt"))
+        form.project.default = current_collection_project.id
+        form.project.process([])
+    else:
+        form.project.choices.insert(0,("", "Ingen prosjekt valgt"))
+    
     form.collection_name.data = collection.name
-    return render_template("collection.html", collection=collection, form=form)
+    if request.method == "POST":
+
+        if addForm.submit.data and addForm.validate():
+            print("addform")
+
+
+        if form.submit.data and form.validate():
+                print("test2")
+                collection.name = request.form["collection_name"].upper()
+                collection.slug = str_to_slug(request.form["collection_name"])
+                collection.project_id = request.form["project"]
+                db.session.commit()
+                flash("Collection updated!")
+                return redirect(url_for("product_col.collections"))
+                
+        else:
+            flash("Error")
+            return redirect(url_for("product_col.collections"))
+        
+
+    return render_template("collection.html", collection=collection, form=form, projects=projects, products=products, addForm=addForm)
+
+@product_col.route("/collections/delete/<string:name>", methods=["GET", "POST"])
+def delete_col(name):
+    col_to_delete = Collections.query.filter_by(name=name).first()
+    try:
+        db.session.delete(col_to_delete)
+        db.session.commit()
+        flash("Collection deleted")
+        return redirect(url_for("product_col.collections"))
+    except:
+        flash("There was a problem")
+        return redirect(url_for("product_col.collections"))

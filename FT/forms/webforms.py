@@ -64,4 +64,15 @@ class AddProductForm(FlaskForm):
     submit = SubmitField("Submit")
 class AddCollection(FlaskForm):
     collection_name = StringField('collection_name', validators=[DataRequired()])
+    project = SelectField('projects')
     submit = SubmitField("Submit")
+
+class UpdateCollectionForm(FlaskForm):
+    collection_name = StringField('collection_name', validators=[DataRequired()])
+    project = SelectField('projects')
+    submit = SubmitField("Submit")
+
+class AddToCollection(FlaskForm):
+    product_id = StringField("product_id")
+    project_id = StringField("project_id")
+    submit = SubmitField("AddToCollection")
