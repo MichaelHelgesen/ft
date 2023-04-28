@@ -11,7 +11,6 @@ from functools import wraps
 from FT.models.collections import Collections
 from FT.models.projects import Project
 from FT.models.products import Products
-from FT.models.products_collections import products_collections
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, current_user, logout_user
 import re
@@ -27,8 +26,18 @@ def str_to_slug(string, delimeter = "-"):
 
 @product_col.route("/collections", methods=["GET", "POST"])
 def collections():
-    form = webforms.AddCollection()
+    
     collections = Collections.query.all()
+    projects = Project.query.all()
+
+    if projects:
+        form = webforms.AddCollection()
+        form.project.choices = [(project.id, project.name.title()) for project in projects]
+        form.project.choices.insert(0, ("", "Velg prosjekt"))
+    else:
+        form = webforms.AddCollectionNoProjectForm()
+
+
     if request.method == "POST":
         if form.validate_on_submit():
             collection_id = form.collection_name.data.upper()  
@@ -46,41 +55,52 @@ def collections():
                 flash("Collection name already exists")
                 return redirect(url_for("product_col.collections", form=form, collections=collections))
 
-    return render_template("collections.html", form=form, collections=collections)
+    return render_template("collections.html", form=form, collections=collections, projects=projects)
 
 @product_col.route("/collections/<string:slug>", methods=["GET", "POST"])
 def collection(slug):
-    form = webforms.AddCollection()
+    
     addForm = webforms.AddToCollection()
     collection = Collections.query.filter_by(slug=slug).first()
-    product_collection = products_collections.query.all()
+    #product_collection = products_collections.query.all()
     products = Products.query.all()
     projects = Project.query.all()
-    print(projects)
-    current_collection_project = Project.query.filter_by(id = collection.project_id).first()
-    #updateForm = webforms.UpdateCollectionForm()
-    form.project.choices = [(project.id, project.name.title()) for project in projects]
-    if current_collection_project:
-        form.project.choices.insert(0,("", "Ingen prosjekt valgt"))
-        form.project.default = current_collection_project.id
-        form.project.process([])
+    #selectedProducts  = Products.query.filter_by()
+
+    if projects:
+        form = webforms.AddCollection()
+        current_collection_project = Project.query.filter_by(id = collection.project_id).first()
+        #updateForm = webforms.UpdateCollectionForm()
+        form.project.choices = [(project.id, project.name.title()) for project in projects]
+        if current_collection_project:
+            form.project.choices.insert(0,("", "Ingen prosjekt valgt"))
+            form.project.default = current_collection_project.id
+            form.project.process([])
+        else:
+            form.project.choices.insert(0,("", "Ingen prosjekt valgt"))
     else:
-        form.project.choices.insert(0,("", "Ingen prosjekt valgt"))
-    
+        form = form = webforms.AddCollectionNoProjectForm()
+  
     form.collection_name.data = collection.name
+    
     if request.method == "POST":
 
         if addForm.submit2.data and addForm.validate():
             print(addForm.data)
             flash("Added to collection!")
+            print(request.form["product_id"])
+            print(Products.query.filter_by(nrf=request.form["product_id"]).first())
+            #collection.product = Products.query.filter_by(nrf=request.form["product_id"]).first()
+            collection.product.append(Products.query.filter_by(nrf=request.form["product_id"]).first())
+            db.session.commit()
             return redirect(request.url)
-
 
         if form.submit.data and form.validate():
             print("test2")
             collection.name = request.form["collection_name"].upper()
             collection.slug = str_to_slug(request.form["collection_name"])
-            collection.project_id = request.form["project"]
+            if projects:
+                collection.project_id = request.form["project"]
             db.session.commit()
             flash("Collection updated!")
             return redirect(url_for("product_col.collections"))

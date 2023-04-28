@@ -19,6 +19,11 @@
     {{ form.collection_name.label }}
     {{ form.collection_name }}
     <br />
+    {% if projects %}
+    {{ form.project.label }}
+    {{ form.project }}
+    {% endif %}
+    <br/>
     {{ form.submit }}
 </form>
 {% endblock %}

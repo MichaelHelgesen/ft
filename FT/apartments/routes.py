@@ -72,19 +72,25 @@ def apartment_edit(slug):
     projects = Project.query.all()
     current_apartment_project = Project.query.filter_by(id = apartment.project_id).first()
     form = webforms.UpdateApartmentForm()
-    form.project.choices = [(project.id, project.name.title()) for project in projects]
-    if current_apartment_project:
+    
+    if projects:
+        form.project.choices = [(project.id, project.name.title()) for project in projects]
         form.project.choices.insert(0,("", "Ingen prosjekt valgt"))
-        form.project.default = current_apartment_project.id
-        form.project.process([])
+        if current_apartment_project:
+            form.project.default = current_apartment_project.id
+            form.project.process([])
     else:
-        form.project.choices.insert(0,("", "Ingen prosjekt valgt"))
+        form = webforms.AddApartmentNoProjectForm()
+        #form.project.choices.insert(0,("", "Ingen prosjekt valgt"))
+
     form.apartment_id.data = id
+    
     if request.method == "POST":
         if form.validate_on_submit():
                 apartment.apartment_id = request.form["apartment_id"].upper()
                 apartment.slug = str_to_slug(request.form["apartment_id"])
-                apartment.project_id = request.form["project"]
+                if projects:
+                    apartment.project_id = request.form["project"]
                 db.session.commit()
                 flash("User updated!")
                 return redirect(url_for("apartments.apartments_list"))

@@ -49,11 +49,14 @@
                     <div style="display: flex;">
                         <div>
                             <form action="#" method="POST">
-                                {{ addForm.hidden_tag() }}{{ addForm.submit2 }}
+                                {{ addForm.hidden_tag() }}
+                                <input id="product_id" name="product_id" type="text" value="{{ product.nrf }}" readonly>
+                                {{ addForm.submit2 }}
                                 <input type="checkbox" name="mycheckboxes">
+                                <input id="submit2" name="submit2" type="submit" value="Add To Collection">
                             </form>
                         </div>
-                        <div>{{ product.nrf}} - {{ product.produktnavn }} - {{ product.farge }}</div>
+                        <div><span class="nrf">{{ product.nrf}}</span> - {{ product.produktnavn }} - {{ product.farge }}</div>
                         
                     </div>
                 </li>

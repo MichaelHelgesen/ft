@@ -62,9 +62,14 @@ class AddProductForm(FlaskForm):
     farge = StringField('farge')
     enhet = StringField('enhet')
     submit = SubmitField("Submit")
+
 class AddCollection(FlaskForm):
     collection_name = StringField('collection_name', validators=[DataRequired()])
     project = SelectField('projects')
+    submit = SubmitField("Submit")
+
+class AddCollectionNoProjectForm(FlaskForm):
+    collection_name = StringField('collection_name', validators=[DataRequired()])
     submit = SubmitField("Submit")
 
 class UpdateCollectionForm(FlaskForm):

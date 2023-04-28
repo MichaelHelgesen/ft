@@ -27,3 +27,9 @@ class Products(HasSlug, db.Model):
     mal = db.Column(db.String)
     farge = db.Column(db.String)
     enhet = db.Column(db.String)
+
+    def __str__(self):
+        return self.nrf
+    
+    def __unicode__(self):
+        return self.nrf
