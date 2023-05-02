@@ -8,7 +8,7 @@ import sqlite3
 import os
 import urllib
 from functools import wraps
-from FT.models.collections import Collections
+from FT.models.collections import Collections, products_collections
 from FT.models.projects import Project
 from FT.models.products import Products
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -57,15 +57,36 @@ def collections():
 
     return render_template("collections.html", form=form, collections=collections, projects=projects)
 
+
+
+
 @product_col.route("/collections/<string:slug>", methods=["GET", "POST"])
 def collection(slug):
     
     addForm = webforms.AddToCollection()
+    removeForm = webforms.RemoveFromCollection()
     collection = Collections.query.filter_by(slug=slug).first()
-    #product_collection = products_collections.query.all()
+    collections = Collections.query.all()
+    #product_collection = db.Table.query(products_collections).query.all()
     products = Products.query.all()
     projects = Project.query.all()
+    chosenProducts = db.session.query(Products).join(Collections.product).filter(Collections.name == collection.name).all()
+    productsAvaliable = db.session.query(Products).outerjoin(products_collections, Products.nrf == products_collections.columns.products_id).filter(products_collections.columns.products_id == None).all()
+
     #selectedProducts  = Products.query.filter_by()
+    products_not_in_collection = Products.query.filter_by(nrf = "5524").all()
+    test2 = Collections.query.filter_by(name = "TEST2").first()
+    print(test2)
+    #test = Products.query.join(test2.product).all()
+    #test3 = db.session.query(Collections, products_collections).filter(Collections = "5524").all()
+    #print("PRODUCTS IN COLLETION: ", test4)
+    test6 = db.session.query(Products).join(Collections.product).filter(Collections.name == collection.name)
+
+    #test5 = db.session.query(Products).join(products_collections).filter(products_collections.columns.products_id.in_(test6)).all()
+    test7 = db.session.query(Products, products_collections).filter(Products.nrf != products_collections.columns.products_id).all()
+    test8 = db.session.query(Products).join(products_collections).filter(Products.nrf.in_([products_collections.columns.products_id])).all()
+    print("PRODUCTS NOT IN COLLETION: ", test7)
+    #query = query.filter(table_a.id.not_in(subquery))
 
     if projects:
         form = webforms.AddCollection()
@@ -95,6 +116,15 @@ def collection(slug):
             db.session.commit()
             return redirect(request.url)
 
+        if removeForm.submit3.data and removeForm.validate():
+            flash("Removed from collection!")
+            #print(request.form["product_id"])
+            #print(Products.query.filter_by(nrf=request.form["product_id"]).first())
+            #collection.product = Products.query.filter_by(nrf=request.form["product_id"]).first()
+            collection.product.remove(Products.query.filter_by(nrf=request.form["product_id"]).first())
+            db.session.commit()
+            return redirect(request.url)
+
         if form.submit.data and form.validate():
             print("test2")
             collection.name = request.form["collection_name"].upper()
@@ -110,7 +140,7 @@ def collection(slug):
             return redirect(url_for("product_col.collections"))
         
 
-    return render_template("collection.html", collection=collection, form=form, projects=projects, products=products, addForm=addForm)
+    return render_template("collection.html", collection=collection, form=form, projects=projects, products=products, addForm=addForm, chosenProducts=chosenProducts, removeForm=removeForm, productsAvaliable=productsAvaliable)
 
 @product_col.route("/collections/delete/<string:name>", methods=["GET", "POST"])
 def delete_col(name):
