@@ -26,8 +26,9 @@ from .models.add_user import Users
 from .models.projects import Project
 from .models.apartments import Apartments
 from .models.products import Products
+from .models.apartmenttype import Apartmenttype
 #from .models.products_collections import products_collections
-from .models.collections import Collections
+#from .models.collections import Collections
 
 
 admin = Admin(app)

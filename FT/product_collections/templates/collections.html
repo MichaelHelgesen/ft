@@ -8,16 +8,16 @@
 </div>
 {% endfor %}
 {{ sample_data }}
-<h2>Collections</h2>
-{% for collection in collections %}
-    <a href="{{url_for('product_col.collection', slug=collection.slug)}}">{{ collection.name.title() }}</a>
+<h2>Apartmenttypes</h2>
+{% for apartmenttypes in apartmenttypes %}
+    <a href="{{url_for('product_col.collection', slug=apartmenttypes.slug)}}">{{ apartmenttypes.name.title() }}</a>
 {% endfor %}
 <br/><br/>
-<h3>Legg til produktpakke</h3>
+<h3>Legg til leilighetstype</h3>
 <form action="/collections" method="POST">
     {{ form.hidden_tag() }}
-    {{ form.collection_name.label }}
-    {{ form.collection_name }}
+    {{ form.apartmenttype_name.label }}
+    {{ form.apartmenttype_name }}
     <br />
     {% if projects %}
     {{ form.project.label }}

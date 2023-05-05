@@ -9,11 +9,11 @@
 </div>
 {% endfor %}
 {{ sample_data }}
-<h2>Edit Product collection {{ collection.name.title() }}</h2>
-<form action="/collections/{{ collection.slug }}" method="POST">
+<h2>Edit Apartmenttype {{ apartmenttype.name.title() }}</h2>
+<form action="/collections/{{ apartmenttype.slug }}" method="POST">
     {{ form.hidden_tag() }}
-    {{ form.collection_name.label }}
-    {{ form.collection_name }}
+    {{ form.apartmenttype_name.label }}
+    {{ form.apartmenttype_name }}
     <br />
     {% if projects %}
     {{ form.project.label }}
@@ -22,51 +22,7 @@
     <br />
     {{ form.submit }}
 </form>
-<div style="display: flex">
-    <div>
-        <h3>Tilgjengelige produkter</h3>
-        <ul style="max-width: 600px; margin: 0;">
-            {% for product in productsAvaliable %}
-            <li style="list-style-type:none; background: #ccc; padding: 5px; margin-bottom: 5px;">
-                <div style="display: flex;">
-                    <div>
-                        <form action="#" method="POST">
-                            {{ addForm.hidden_tag() }}
-                            <input id="product_id" name="product_id" type="text" value="{{ product.nrf }}" readonly>
-                            {{ addForm.submit2 }}
-                            <input type="checkbox" name="mycheckboxes">
-                            <input id="submit2" name="submit2" type="submit" value="Add To Collection">
-                        </form>
-                    </div>
-                    <div><span class="nrf">{{ product.nrf}}</span> - {{ product.produktnavn }} - {{ product.farge }}</div>
-                    </div>
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
-    <div>
-        <h3>Valgte produkter</h3>
-        <ul style="max-width: 600px;">
-            {% for product in chosenProducts %}
-                <li style="list-style-type:none; background: #ccc; padding: 5px; margin-bottom: 5px;">
-                    <div style="display: flex;">
-                        <div>
-                            <form action="#" method="POST">
-                                {{ removeForm.hidden_tag() }}
-                                <input id="product_id" name="product_id" type="text" value="{{ product.nrf }}" readonly>
-                                {{ removeForm.submit3 }}
-                                <input type="checkbox" name="mycheckboxes">
-                                <input id="submit3" name="submit3" type="submit" value="Remove From Collection">
-                            </form>
-                        </div>
-                        <div><span class="nrf">{{ product.nrf}}</span> - {{ product.produktnavn }} - {{ product.farge }}</div>
-                        
-                    </div>
-                </li>
-            {% endfor %}
-            </ul>
-    </div>
-</div>
-<a href="{{url_for('product_col.delete_col', name=collection.name)}}">Delete collection</a>
+
+<a href="{{url_for('product_col.delete_col', name=apartmenttype.name)}}">Delete collection</a>
 <script src="{{url_for('static', filename='js/product_selection.js')}}"></script>
 {% endblock %}
