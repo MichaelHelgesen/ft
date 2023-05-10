@@ -13,11 +13,17 @@ class HasSlug:
         nullable=False,
     )
 
+""" apartments_apartmenttypes = db.Table("apartments_apartmenttypes",
+db.Column("apartmenttypes_id", db.Integer, db.ForeignKey("apartmenttype.id")),
+db.Column("apartments_id", db.String, db.ForeignKey("apartments.id"))
+)
+ """
 
 class Apartmenttype(HasSlug, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    #apartment = db.relationship("Apartment", secondary=apartments_apartmenttypes, backref=db.backref('apartmenttype', lazy='dynamic'))
 
     def __repr__(self):
         return '<Apartmenttype %r>' % self.name

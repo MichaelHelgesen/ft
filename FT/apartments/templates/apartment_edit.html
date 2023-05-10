@@ -16,7 +16,11 @@
     <br />
     {% if projects %}
     {{ form.project.label }}
-    {{ form.project }}
+    {{ form.project }}<br/>
+        {% if apartmenttypes %}
+            {{ form.apartmenttype.label }}
+            {{ form.apartmenttype }}
+        {% endif %}
     {% endif %}
     <br />
     {{ form.submit }}

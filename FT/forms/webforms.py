@@ -47,7 +47,17 @@ class AddApartmentNoProjectForm(FlaskForm):
 
 class UpdateApartmentForm(FlaskForm):
     apartment_id = StringField('apartment_id', validators=[DataRequired()])
-    project = SelectField('projects') 
+    project = SelectField('projects')
+    apartmenttype = SelectField('apartmenttype') 
+    submit = SubmitField("Submit")
+
+class UpdateApartmentNoProjectForm(FlaskForm):
+    apartment_id = StringField('apartment_id', validators=[DataRequired()])
+    submit = SubmitField("Submit")
+
+class UpdateApartmentNoApartmenttypeForm(FlaskForm):
+    apartment_id = StringField('apartment_id', validators=[DataRequired()])
+    project = SelectField('projects')
     submit = SubmitField("Submit")
 
 class AddProductForm(FlaskForm):
@@ -81,3 +91,7 @@ class RemoveApartmentTypeForm(FlaskForm):
     apartmenttype_name = StringField('apartmenttype_name', validators=[DataRequired()])
     project = SelectField('projects')
     submit3 = SubmitField("Submit")
+
+class AddRoomForm(FlaskForm):
+    room_name = StringField('room_name', validators=[DataRequired()])
+    submit_room = SubmitField("Submit")

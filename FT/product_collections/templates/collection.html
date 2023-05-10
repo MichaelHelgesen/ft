@@ -9,7 +9,21 @@
 </div>
 {% endfor %}
 {{ sample_data }}
-<h2>Edit Apartmenttype {{ apartmenttype.name.title() }}</h2>
+<h1>Edit Apartmenttype {{ apartmenttype.name.title() }}</h1>
+<h2>Add rooms</h2>
+{% if apartmenttype_rooms %}
+    {% for rooms in apartmenttype_rooms %}
+        <a href="{{url_for('product_col.collection_room', apartmenttype=apartmenttype.slug, slug=rooms.slug)}}">{{ rooms.name.title() }}</a>
+    {% endfor %}
+{% endif %}
+<form action="/collections/{{ apartmenttype.slug }}" method="POST">
+    {{ room_form.hidden_tag() }}
+    {{ room_form.room_name.label }}
+    {{ room_form.room_name }}
+    <br />
+    {{ room_form.submit_room }}
+</form>
+<h2>Edit details</h2>
 <form action="/collections/{{ apartmenttype.slug }}" method="POST">
     {{ form.hidden_tag() }}
     {{ form.apartmenttype_name.label }}

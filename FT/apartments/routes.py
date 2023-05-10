@@ -7,7 +7,8 @@ import pandas as pd
 from functools import wraps
 from FT.models.apartments import Apartments
 from FT.models.projects import Project
-from FT.models.collections import Collections
+from FT.models.apartmenttype import Apartmenttype
+from FT.models.apartments import apartments_apartmenttypes
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, current_user, logout_user
 import csv
@@ -16,27 +17,34 @@ import re
 apartments = Blueprint('apartments', __name__, static_folder="static",
                   template_folder="templates")
 
+# URL-vennlig path
 def str_to_slug(string, delimeter = "-"):
     slug = re.sub(r"[^\w\d\s]", "", string.strip().lower())
     slug = re.sub(" +", " ", slug)
     slug = slug.replace(" ", delimeter)
     return slug
 
+# Landingsside for alle leiligheter
 @apartments.route('/apartments', methods=["GET", "POST"])
 def apartments_list():
+
+    # Alle leiligheter
     apartments = Apartments.query.all()
+    
+    # Alle prosjekter
     projects = Project.query.all()
 
+    # Vis nedtrekksmeny for prosjekter hvis prosjekter eksisterer
     if projects:
         form = webforms.AddApartmentForm()
         form.project.choices = [(project.id, project.name.title()) for project in projects]
         form.project.choices.insert(0, ("", "Velg prosjekt"))
     else:
         form = webforms.AddApartmentNoProjectForm()
-    
-    
 
     #form.project.choices = [(project.id, project.name.title()) for project in projects]
+    
+    # Hvis nytt prosjekt registreres via skjema
     if request.method == "POST":
         if form.validate_on_submit():
             apartment_id = form.apartment_id.data.upper()  
@@ -63,44 +71,132 @@ def apartments_list():
     return render_template("apartments.html", form=form, apartments=apartments)
 
 
-
+# Landingsside leilighet
 @apartments.route('/apartments/<string:slug>', methods=["GET", "POST"])
 def apartment_edit(slug):
+    # Finn den aktuelle leiligheten
     apartment = Apartments.query.filter_by(slug=slug).first()
     apartment_id = apartment.apartment_id.upper()
     id = apartment.id
+
+    # Hent alle prosjekter
     projects = Project.query.all()
+    # Hent gjeldende leilighets tilknyttede prosjekt, hvis noen
     current_apartment_project = Project.query.filter_by(id = apartment.project_id).first()
-    form = webforms.UpdateApartmentForm()
+
+    # Hent alle leilighetstyper 
+    apartmenttypes = None
+    # Hent gjeldende leilighets tilknyttede leilighetstype, hvis noen
+    current_apartmenttype = Apartmenttype.query.filter_by(id = apartment.apartmenttype_id).first()
     
+    if current_apartmenttype:
+        print("Satt leilighetstype?", current_apartmenttype.id)
+    else:
+        print("INGEN LEILIGHETSTYPE SATT")
+    if current_apartment_project:
+        print("Satt prosjekt" , current_apartment_project)
+    else:
+        print("INGEN PROSJEKT SATT")
+    
+    form = webforms.UpdateApartmentNoProjectForm()
+
+    # Oppdateringsskjema
+    #if projects:
+        #form = webforms.UpdateApartmentForm()
+    #else:
+        #form = webforms.UpdateApartmentNoProjectForm
+    
+
+
+    # Hent tilknyttede leilighetstyper hvis eksisterer, 
+    # og prosjekt er valgt
+    #apartmenttypes = Apartmenttype.query.filter_by(project_id = current_apartment_project.id).all()
+    if current_apartment_project:
+        apartmenttypes = Apartmenttype.query.filter_by(project_id = current_apartment_project.id).all()
+
+    # Vis nedtrekksmeny for prosjekter hvis prosjekter eksisterer, 
+    # og vis tilknyttet prosjekt hvis satt
+    print("PROSJEKTER", projects)
+
     if projects:
+        form = webforms.UpdateApartmentNoApartmenttypeForm()
+        if current_apartment_project:
+            form = webforms.UpdateApartmentForm()
+        if not apartmenttypes:
+            form = webforms.UpdateApartmentNoApartmenttypeForm()
+    else:
+        form = webforms.AddApartmentNoProjectForm()
+
+    print(form)
+    print("Leilighetstyper", apartmenttypes)
+    print("Current leilighetstype", current_apartmenttype)
+
+    if projects:
+        #form = webforms.UpdateApartmentNoApartmenttypeForm()
         form.project.choices = [(project.id, project.name.title()) for project in projects]
         form.project.choices.insert(0,("", "Ingen prosjekt valgt"))
         if current_apartment_project:
+            #form = webforms.UpdateApartmentForm()
+            # Sett valgt prosjekt som default i nedtrekksmenyen
             form.project.default = current_apartment_project.id
             form.project.process([])
-    else:
-        form = webforms.AddApartmentNoProjectForm()
+            #form.apartmenttype.choices = [(apartmenttype.id, apartmenttype.name.title()) for apartmenttype in apartmenttypes]
+            # Vis nedtrekksmeny for leilighetstyper hvis leilighetstyper eksisterer, 
+            # og vis tilknyttet leilighetstype hvis satt 
+            if projects and current_apartment_project and apartmenttypes:
+                form.apartmenttype.choices = [(apartmenttype.id, apartmenttype.name.title()) for apartmenttype in apartmenttypes]
+                form.apartmenttype.choices.insert(0,("", "Ingen leilighetstype valgt"))
+                if current_apartmenttype:
+                    # Sett valgt prosjekt som default i nedtrekksmenyen
+                    form.apartmenttype.default = current_apartmenttype.id
+                    form.apartmenttype.process([])
+            #else:
+                #form = webforms.UpdateApartmentNoApartmenttypeForm()
+                #form.project.choices.insert(0,("", "Ingen prosjekt valgt"))
+    #else:
+        #form = webforms.AddApartmentNoProjectForm()
         #form.project.choices.insert(0,("", "Ingen prosjekt valgt"))
 
-    form.apartment_id.data = id
-    
+    # Hvis innsending av endringer
     if request.method == "POST":
         if form.validate_on_submit():
-                apartment.apartment_id = request.form["apartment_id"].upper()
-                apartment.slug = str_to_slug(request.form["apartment_id"])
-                if projects:
+            # Hvis prosjekter eksisterer
+            if projects:
+                # Hvis man velger "ingen prosjekt"
+                if not request.form["project"]:
+                    apartment.apartmenttype_id = None
+                    if apartment.apartmenttype:
+                        apartment.apartmenttype.remove(current_apartmenttype)
+                    apartment.project_id = None
+                else:
                     apartment.project_id = request.form["project"]
-                db.session.commit()
-                flash("User updated!")
-                return redirect(url_for("apartments.apartments_list"))
-                
+                    # Hvis prosjekt er satt
+                    if current_apartment_project:
+                        # Hvis valgt prosjekt skal overskrive gjeldene
+                        if int(current_apartment_project.id) is not int(request.form["project"]): 
+                            apartment.apartmenttype_id = None
+                            if apartment.apartmenttype:
+                                apartment.apartmenttype.remove(current_apartmenttype)
+                        else:
+                            apartment.apartmenttype_id = request.form["apartmenttype"]
+                            if apartment.apartmenttype:
+                                apartment.apartmenttype.remove(current_apartmenttype)
+                            apartment.apartmenttype.append(Apartmenttype.query.filter_by(id=request.form["apartmenttype"]).first())
+            else:
+                apartment.apartmenttype_id = None
+                if apartment.apartmenttype:
+                    apartment.apartmenttype.remove(current_apartmenttype)
+                apartment.project_id = None
+            db.session.commit()
+            flash("User updated!")
+            return redirect(url_for("apartments.apartments_list"))    
         else:
-            flash("Error")
+            flash("Error apartment")
             return redirect(url_for("apartments.apartments_list"))
     
-    return render_template("apartment_edit.html", apartment_id=apartment_id, id=id, form=form, slug=slug, projects=projects)
+    return render_template("apartment_edit.html", apartment_id=apartment_id, id=id, form=form, slug=slug, projects=projects, apartmenttypes=apartmenttypes)
 
+# Sletting av leilighet
 @apartments.route("/apartments/delete/<int:id>")
 @login_required
 def delete_apartment(id):
