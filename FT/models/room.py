@@ -9,7 +9,7 @@ class HasSlug:
     slug_target_column = "name"
     slug = db.Column(
         db.String,
-        unique=True,
+        #unique=True,
         nullable=False,
     )
 

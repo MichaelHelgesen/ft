@@ -1,1 +1,26 @@
-room
+{% extends "base.html" %}
+
+    {% block content%}
+    
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>{{ message }}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{{ sample_data }}
+<h2>Add categories</h2>
+{% if categories %}
+    {% for category in categories %}
+        <a href="{{url_for('product_col.room_category', apartmenttype=apartmenttype, room=room, slug=category.slug)}}">{{ category.name.title() }}</a>
+    {% endfor %}
+{% endif %}
+<form action="#" method="POST">
+    {{ category_form.hidden_tag() }}
+    {{ category_form.category_name.label }}
+    {{ category_form.category_name }}
+    <br />
+    {{ category_form.submit_category }}
+</form>
+<h2>Edit details</h2>
+{% endblock %}

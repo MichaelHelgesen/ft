@@ -43,7 +43,7 @@ def user_login():
                 name = user.name
                 form.email.data = ""
                 login_user(user, remember=True)
-                return render_template("profile.html", name=name)
+                return redirect("/")
             else:
                 flash("Password is wrong")
                 form.email.data = ""

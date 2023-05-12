@@ -1,5 +1,15 @@
 {% extends "base.html" %} 
 
 {% block content%}
-<h2>Index</h2>
+<h1>Tilvalg</h1>
+{% if current_user.is_authenticated %}
+    <h2>Velkommen {{current_user.name}}</h2>
+    <h3>Dine leiligheter:</h3>
+    {% if user_apartments %}
+    tr
+        {% for apartments in user_apartments %}
+            <p>{{ apartments.apartment_id }}</p>
+        {% endfor %}
+    {% endif %}
+{% endif %}
 {% endblock %}

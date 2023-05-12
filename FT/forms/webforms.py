@@ -95,3 +95,41 @@ class RemoveApartmentTypeForm(FlaskForm):
 class AddRoomForm(FlaskForm):
     room_name = StringField('room_name', validators=[DataRequired()])
     submit_room = SubmitField("Submit")
+
+class AddCategory(FlaskForm):
+    category_name = StringField('category_name', validators=[DataRequired()])
+    submit_category = SubmitField("Submit")
+
+class AddToCollection(FlaskForm):
+    product_id = StringField("product_id")
+    project_id = StringField("project_id")
+    submit2 = SubmitField("Add To Collection")
+
+class RemoveFromCollection(FlaskForm):
+    product_id = StringField("product_id")
+    project_id = StringField("project_id")
+    submit3 = SubmitField("Remove From Collection")
+
+class AddCollection(FlaskForm):
+    collection_name = StringField('collection_name', validators=[DataRequired()])
+    project = SelectField('projects')
+    submit = SubmitField("Submit")
+
+class AddCollectionNoProjectForm(FlaskForm):
+    collection_name = StringField('collection_name', validators=[DataRequired()])
+    submit = SubmitField("Submit")
+
+class UpdateCollectionForm(FlaskForm):
+    collection_name = StringField('collection_name', validators=[DataRequired()])
+    project = SelectField('projects')
+    submit = SubmitField("Submit")
+
+class AddToCollection(FlaskForm):
+    product_id = StringField("product_id")
+    project_id = StringField("project_id")
+    submit2 = SubmitField("Add To Collection")
+
+class RemoveFromCollection(FlaskForm):
+    product_id = StringField("product_id")
+    project_id = StringField("project_id")
+    submit3 = SubmitField("Remove From Collection")

@@ -13,6 +13,7 @@ from FT.models.apartmenttype import Apartmenttype
 from FT.models.projects import Project
 from FT.models.products import Products
 from FT.models.room import Room
+from FT.models.category import Category, products_category
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, current_user, logout_user
 import re
@@ -134,7 +135,109 @@ def collection(slug):
 
 @product_col.route("/collections/<string:apartmenttype>/<string:slug>", methods=["GET", "POST"])
 def collection_room(apartmenttype, slug):
-    return render_template("room.html")
+    form = webforms.AddCategory()
+    print("SLUG", slug)
+    apartmenttype_id = Apartmenttype.query.filter_by(slug=apartmenttype).first()
+    room_id = Room.query.filter(Room.slug.like(slug), Room.apartmenttype.like(apartmenttype_id.id)).first()
+    categories = Category.query.filter_by(room_id=room_id.id).all()
+    if request.method == "POST":
+        if form.submit_category.data and form.validate:
+            new_category = Category()
+            new_category.name = request.form["category_name"]
+            new_category.slug = str_to_slug(request.form["category_name"])
+            new_category.room_id = room_id.id
+            db.session.add(new_category)
+            db.session.commit()
+            flash("cat added")
+        return redirect(request.url)
+    return render_template("room.html", category_form=form, categories=categories, apartmenttype=apartmenttype, room=slug)
+
+@product_col.route("/collections/<string:apartmenttype>/<string:room>/<string:slug>", methods=["GET", "POST"])
+def room_category(apartmenttype, room, slug):
+    
+    addForm = webforms.AddToCollection()
+    removeForm = webforms.RemoveFromCollection()
+    apartmenttype_id = Apartmenttype.query.filter_by(slug=apartmenttype).first()
+    room_id = Room.query.filter(Room.slug.like(room), Room.apartmenttype.like(apartmenttype_id.id)).first()
+
+    category = Category.query.filter(Category.room_id.like(room_id.id), Category.slug.like(slug)).first()
+    #collections = Collections.query.all()
+    #product_collection = db.Table.query(products_collections).query.all()
+    
+    products = Products.query.all()
+    projects = Project.query.all()
+    
+    chosenProducts = db.session.query(Products).join(Category.product).filter(Category.id == category.id).all()
+    productsAvaliable = db.session.query(Products).outerjoin(products_category, Products.nrf == products_category.columns.products_id).filter(products_category.columns.products_id == None).all()
+
+    #selectedProducts  = Products.query.filter_by()
+    products_not_in_collection = Products.query.filter_by(nrf = "5524").all()
+    #test2 = Collections.query.filter_by(name = "TEST2").first()
+    #print(test2)
+    #test = Products.query.join(test2.product).all()
+    #test3 = db.session.query(Collections, products_collections).filter(Collections = "5524").all()
+    #print("PRODUCTS IN COLLETION: ", test4)
+    #test6 = db.session.query(Products).join(Collections.product).filter(Collections.name == collection.name)
+
+    #test5 = db.session.query(Products).join(products_collections).filter(products_collections.columns.products_id.in_(test6)).all()
+    #test7 = db.session.query(Products, products_collections).filter(Products.nrf != products_collections.columns.products_id).all()
+    #test8 = db.session.query(Products).join(products_collections).filter(Products.nrf.in_([products_collections.columns.products_id])).all()
+    #print("PRODUCTS NOT IN COLLETION: ", test7)
+    #query = query.filter(table_a.id.not_in(subquery))
+
+    if projects:
+        form = webforms.AddCollection()
+        #current_collection_project = Project.query.filter_by(id = collection.project_id).first()
+        #updateForm = webforms.UpdateCollectionForm()
+        #form.project.choices = [(project.id, project.name.title()) for project in projects]
+        #if current_collection_project:
+            #form.project.choices.insert(0,("", "Ingen prosjekt valgt"))
+            #form.project.default = current_collection_project.id
+            #form.project.process([])
+        #else:
+            #form.project.choices.insert(0,("", "Ingen prosjekt valgt"))
+    #else:
+        form = webforms.AddCollectionNoProjectForm()
+  
+    #form.collection_name.data = collection.name
+    
+    if request.method == "POST":
+
+        if addForm.submit2.data and addForm.validate():
+            print(addForm.data)
+            flash("Added to collection!")
+            print(request.form["product_id"])
+            print(Products.query.filter_by(nrf=request.form["product_id"]).first())
+            #collection.product = Products.query.filter_by(nrf=request.form["product_id"]).first()
+            category.product.append(Products.query.filter_by(nrf=request.form["product_id"]).first())
+            db.session.commit()
+            return redirect(request.url)
+
+        if removeForm.submit3.data and removeForm.validate():
+            flash("Removed from collection!")
+            #print(request.form["product_id"])
+            #print(Products.query.filter_by(nrf=request.form["product_id"]).first())
+            #collection.product = Products.query.filter_by(nrf=request.form["product_id"]).first()
+            category.product.remove(Products.query.filter_by(nrf=request.form["product_id"]).first())
+            db.session.commit()
+            return redirect(request.url)
+
+        if form.submit.data and form.validate():
+            print("test2")
+            collection.name = request.form["collection_name"].upper()
+            collection.slug = str_to_slug(request.form["collection_name"])
+            if projects:
+                collection.project_id = request.form["project"]
+            db.session.commit()
+            flash("Collection updated!")
+            return redirect(url_for("product_col.collections"))
+                
+        else:
+            flash("Error")
+            return redirect(url_for("product_col.collections"))
+        
+
+    return render_template("category.html", category=category, form=form, projects=projects, products=products, addForm=addForm, chosenProducts=chosenProducts, removeForm=removeForm, productsAvaliable=productsAvaliable)
 
 @product_col.route("/collections/delete/<string:name>", methods=["GET", "POST"])
 def delete_col(name):
