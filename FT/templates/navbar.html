@@ -10,37 +10,44 @@
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="{{ url_for('page.index')}}">Home</a>
                 </li>
+                {% if not current_user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="{{ url_for('login.user_login')}}">Login</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="{{ url_for('login.user_register')}}">Register</a>
                 </li>
+                {% endif %}
                 {% if current_user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{{ url_for('user_apartments.apartment_list')}}">Your apartments</a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="{{ url_for('login.user_profile')}}">Profile</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="{{ url_for('login.user_logout')}}">Logout</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="{{ url_for('login.admin_users')}}">Users</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="{{ url_for('login.admin_import')}}">Import</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="{{ url_for('projects.project_list')}}">Projects</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="{{ url_for('apartments.apartments_list')}}">Apartments</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="{{ url_for('products.product_list')}}">Products</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="{{ url_for('product_col.collections')}}">Collections</a>
-                </li>
+                    {% if "admin" in current_user.role %}
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('login.admin_users')}}">Users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('login.admin_import')}}">Import</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('projects.project_list')}}">Projects</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('apartments.apartments_list')}}">Apartments</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('products.product_list')}}">Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('product_col.collections')}}">Collections</a>
+                    </li>
+                    {% endif %}
                 {% endif %}
             </ul>
             <form class="d-flex" role="search" method="POST" action="">

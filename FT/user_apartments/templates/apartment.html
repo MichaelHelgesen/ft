@@ -1,14 +1,10 @@
 {% extends "base.html" %} 
 
 {% block content%}
-<h1>Tilvalg</h1>
-{% if current_user.is_authenticated %}
-    <h2>Velkommen {{current_user.name}}</h2>
-    <h3>Dine leiligheter:</h3>
+<h1>Dine leiligheter</h1>
     {% if user_apartments %}
         {% for apartments in user_apartments %}
             <p>{{ apartments.apartment_id }}</p>
         {% endfor %}
-    {% endif %}
 {% endif %}
 {% endblock %}
