@@ -1,0 +1,10 @@
+{% extends "base.html" %} 
+
+{% block content%}
+<h1>Rom i leilighet {{ apartment }}</h1>
+    {% if user_rooms %}
+        {% for rooms in user_rooms %}
+            <a href="{{url_for('user_apartments.apartment_category', apartment=apartment, room=rooms.name)}}">{{ rooms.name }}</a>
+        {% endfor %}
+{% endif %}
+{% endblock %}

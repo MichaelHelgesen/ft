@@ -4,7 +4,7 @@
 <h1>Dine leiligheter</h1>
     {% if user_apartments %}
         {% for apartments in user_apartments %}
-            <p>{{ apartments.apartment_id }}</p>
+            <a href="{{url_for('user_apartments.apartment_rooms', apartment=apartments.apartment_id)}}">{{ apartments.apartment_id }}</a>
         {% endfor %}
 {% endif %}
 {% endblock %}

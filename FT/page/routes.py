@@ -7,6 +7,7 @@ page = Blueprint('page', __name__, static_folder="static", template_folder="temp
 
 @page.route('/')
 def index():
+
     if current_user.is_authenticated:
         user_apartments = Apartments.query.filter_by(id = current_user.apartment_id).all()
         return render_template("index.html", name=current_user, user_apartments=user_apartments)

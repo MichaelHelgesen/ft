@@ -6,6 +6,7 @@ import io
 import pandas as pd
 from functools import wraps
 from FT.models.projects import Project
+from FT.models.add_user import Role
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, current_user, logout_user
 import csv
@@ -20,8 +21,24 @@ def str_to_slug(string, delimeter = "-"):
     slug = slug.replace(" ", delimeter)
     return slug
 
+def requires_access_level(logged_user):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            user_role = Role.query.filter_by(name="admin").first()
+            if not user_role in logged_user.role:
+                flash("not authorized")
+                return redirect(url_for('login.user_login'))
+
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+
 @projects.route('/projects', methods=["GET", "POST"])
-def project_list():
+@login_required
+@requires_access_level(current_user)
+def project_list():    
     form = webforms.ProjectForm()
     projects = Project.query.all()
     if request.method == "POST":
