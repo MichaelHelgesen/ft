@@ -19,8 +19,16 @@
                 </li>
                 {% endif %}
                 {% if current_user.is_authenticated %}
+                {% for x in current_user.role %}
+                {% if x.name == "user": %}
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="{{ url_for('user_apartments.apartment_list')}}">Your apartments</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{{ url_for('user_apartments.apartment_list')}}">Your orders</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{{ url_for('user_apartments.apartment_list')}}">Shopping cart</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="{{ url_for('login.user_profile')}}">Profile</a>
@@ -28,7 +36,7 @@
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="{{ url_for('login.user_logout')}}">Logout</a>
                 </li>
-                    {% for x in current_user.role %}
+                {% endif %}    
                         {% if x.name == "admin": %}
                             <li class="nav-item">
                                 <a class="nav-link active" aria-current="page" href="{{ url_for('login.admin_users')}}">Users</a>

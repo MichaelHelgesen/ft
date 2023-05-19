@@ -1,0 +1,10 @@
+{% extends "base.html" %} 
+
+{% block content%}
+<h1>{{ category }} til {{ room }} i leilighet {{ apartment }}</h1>
+    {% if products %}
+        {% for product in products %}
+            <a href="{{url_for('user_apartments.apartment_products', apartment=apartment, room=room, category=category, product=product.slug)}}">{{ product.produktnavn }}</a>
+        {% endfor %}
+{% endif %}
+{% endblock %}

@@ -76,11 +76,13 @@ class AddProductForm(FlaskForm):
 class AddApartmentTypeForm(FlaskForm):
     apartmenttype_name = StringField('apartmenttype_name', validators=[DataRequired()])
     project = SelectField('projects')
+    set_standard = BooleanField("set_standard")
     submit = SubmitField("Submit")
 
 class UpdateApartmentTypeForm(FlaskForm):
     apartmenttype_name = StringField('apartmenttype_name', validators=[DataRequired()])
     project = SelectField('projects')
+    set_standard = BooleanField("set_standard")
     submit2 = SubmitField("Submit")
 
 class AddApartmentTypeNoProjectForm(FlaskForm):

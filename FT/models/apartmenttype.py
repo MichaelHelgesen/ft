@@ -24,7 +24,7 @@ class Apartmenttype(HasSlug, db.Model):
     name = db.Column(db.String(200), nullable=False)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     #apartment = db.relationship("Apartment", secondary=apartments_apartmenttypes, backref=db.backref('apartmenttype', lazy='dynamic'))
-
+    is_standard = db.Column(db.Boolean)
     def __repr__(self):
         return '<Apartmenttype %r>' % self.name
     

@@ -78,7 +78,9 @@ def collection(slug):
     projects = Project.query.all()
     apartmenttype_rooms = Room.query.filter_by(apartmenttype = apartmentType.id).all()
     print("APARTMENT ROOMS", apartmenttype_rooms)
-
+    current_apartmenttype_project = Project.query.filter_by(id = apartmentType.project_id).first()
+    standard_apartmenttype = Apartmenttype.query.filter_by(project_id=current_apartmenttype_project.id, is_standard=1).first()
+    print("STANDARD", standard_apartmenttype)
     if projects:
         form = webforms.AddApartmentTypeForm()
         current_apartmenttype_project = Project.query.filter_by(id = apartmentType.project_id).first()
@@ -94,6 +96,9 @@ def collection(slug):
         form = form = webforms.AddApartmentTypeNoProjectForm()
   
     form.apartmenttype_name.data = apartmentType.name
+
+    if apartmentType.is_standard:
+        form.set_standard.data = 1
     
     if request.method == "POST":
         
@@ -120,18 +125,22 @@ def collection(slug):
         if form.submit.data and form.validate():
             apartmentType.name = request.form["apartmenttype_name"].upper()
             apartmentType.slug = str_to_slug(request.form["apartmenttype_name"])
+            print("STANDARD", request.form["set_standard"])
+            if request.form["set_standard"]:
+                apartmentType.is_standard = True
+            else:
+                apartmentType.is_standard = False
             if projects:
                 apartmentType.project_id = request.form["project"]
             db.session.commit()
             flash("Collection updated!")
             return redirect(url_for("product_col.collections"))
-     
         else:
             flash("Error")
             return redirect(url_for("product_col.collections"))
         
 
-    return render_template("collection.html", apartmenttype=apartmentType, form=form, projects=projects, room_form=room_form, apartmenttype_rooms=apartmenttype_rooms)
+    return render_template("collection.html", standard=standard_apartmenttype, apartmenttype=apartmentType, form=form, projects=projects, room_form=room_form, apartmenttype_rooms=apartmenttype_rooms)
 
 @product_col.route("/collections/<string:apartmenttype>/<string:slug>", methods=["GET", "POST"])
 def collection_room(apartmenttype, slug):
@@ -152,6 +161,7 @@ def collection_room(apartmenttype, slug):
         return redirect(request.url)
     return render_template("room.html", category_form=form, categories=categories, apartmenttype=apartmenttype, room=slug)
 
+# PRODUKT
 @product_col.route("/collections/<string:apartmenttype>/<string:room>/<string:slug>", methods=["GET", "POST"])
 def room_category(apartmenttype, room, slug):
     
@@ -166,10 +176,17 @@ def room_category(apartmenttype, room, slug):
     
     products = Products.query.all()
     projects = Project.query.all()
+    filtered = []
     
     chosenProducts = db.session.query(Products).join(Category.product).filter(Category.id == category.id).all()
     productsAvaliable = db.session.query(Products).outerjoin(products_category, Products.nrf == products_category.columns.products_id).filter(products_category.columns.products_id == None).all()
 
+    for x in products:
+        if x not in chosenProducts:
+            filtered.append(x)
+
+    #testProducts = Products.query.filter(Room.name.like(room), Room.apartmenttype.like(apartmenttype.id)).first()
+    
     #selectedProducts  = Products.query.filter_by()
     products_not_in_collection = Products.query.filter_by(nrf = "5524").all()
     #test2 = Collections.query.filter_by(name = "TEST2").first()
@@ -237,7 +254,7 @@ def room_category(apartmenttype, room, slug):
             return redirect(url_for("product_col.collections"))
         
 
-    return render_template("category.html", category=category, form=form, projects=projects, products=products, addForm=addForm, chosenProducts=chosenProducts, removeForm=removeForm, productsAvaliable=productsAvaliable)
+    return render_template("category.html", category=category, form=form, projects=projects, products=products, addForm=addForm, chosenProducts=chosenProducts, removeForm=removeForm, productsAvaliable=filtered)
 
 @product_col.route("/collections/delete/<string:name>", methods=["GET", "POST"])
 def delete_col(name):

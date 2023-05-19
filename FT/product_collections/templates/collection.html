@@ -32,6 +32,12 @@
     {% if projects %}
     {{ form.project.label }}
     {{ form.project }}
+    {% if standard == apartmenttype %}
+    {{ form.set_standard.label }}
+    {{ form.set_standard}}
+    {% else %}
+    Kan ikke sette som standard. Standard allerede satt: <a href="{{url_for('product_col.collection', slug=standard.slug)}}">{{ standard.name}}</a>
+    {% endif %}
     {% endif %}
     <br />
     {{ form.submit }}

@@ -2,9 +2,9 @@
 
 {% block content%}
 <h1>Kategorier til {{ room }} i leilighet {{ apartment }}</h1>
-    {% if user_rooms %}
-        {% for rooms in user_rooms %}
-            <a href="{{url_for('user_apartments.apartment_products', apartment=apartment, room=rooms.name, category=category)}}">{{ rooms.name }}</a>
+    {% if categories %}
+        {% for cat in categories %}
+            <a href="{{url_for('user_apartments.apartment_product', apartment=apartment, room=room, category=cat)}}">{{ cat.name }}</a>
         {% endfor %}
 {% endif %}
 {% endblock %}
