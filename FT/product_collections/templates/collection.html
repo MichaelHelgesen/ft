@@ -32,11 +32,11 @@
     {% if projects %}
     {{ form.project.label }}
     {{ form.project }}
-    {% if standard == apartmenttype %}
+    {% if standard == apartmenttype or standard == None %}
     {{ form.set_standard.label }}
     {{ form.set_standard}}
     {% else %}
-    Kan ikke sette som standard. Standard allerede satt: <a href="{{url_for('product_col.collection', slug=standard.slug)}}">{{ standard.name}}</a>
+    Kan ikke sette som standard. Standard allerede satt til dette prosjektet: <a href="{{url_for('product_col.collection', slug=standard.slug)}}">{{ standard.name}}</a>
     {% endif %}
     {% endif %}
     <br />

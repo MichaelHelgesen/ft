@@ -93,7 +93,7 @@ def collection(slug):
         else:
             form.project.choices.insert(0,("", "Ingen prosjekt valgt"))
     else:
-        form = form = webforms.AddApartmentTypeNoProjectForm()
+        form = webforms.AddApartmentTypeNoProjectForm()
   
     form.apartmenttype_name.data = apartmentType.name
 
@@ -125,8 +125,9 @@ def collection(slug):
         if form.submit.data and form.validate():
             apartmentType.name = request.form["apartmenttype_name"].upper()
             apartmentType.slug = str_to_slug(request.form["apartmenttype_name"])
-            print("STANDARD", request.form["set_standard"])
-            if request.form["set_standard"]:
+            print("STANDARD--", form["set_standard"].data)
+            print("check", request.form.getlist('set_standard') )
+            if request.form.getlist('set_standard'):
                 apartmentType.is_standard = True
             else:
                 apartmentType.is_standard = False

@@ -30,7 +30,8 @@ def apartment_rooms(apartment):
         #test = Apartmenttype.query.join(Apartments.apartmenttype_id).filter(Apartments.id == 1).all()
         #test3 = db.session.query(Products).outerjoin(products_category, Products.nrf == products_category.columns.products_id).filter(products_category.columns.products_id == None).all()
         user_rooms = Room.query.filter_by(apartmenttype = apartmenttype.id).all()
-        #print(user_rooms)
+        print(user_rooms)
+        print(user_apartments.id)
         return render_template("apartment_rooms.html", user_rooms=user_rooms, apartment=apartment)
 
 @user_apartments.route('/apartment/<string:apartment>/<string:room>', methods=["GET", "POST"])
