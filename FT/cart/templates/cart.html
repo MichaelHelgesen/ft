@@ -9,5 +9,38 @@
 {% endfor %}
 {{ sample_data }}
 <h2>Cart</h2>
-
+{% if cart_items %}
+    <ul>
+        {% for key in standardproducts.rooms %}
+            <li>{{ key }}</li>
+            {% for x in standardproducts.rooms[key] %}
+                <ul>
+                    {% if standardproducts.rooms[key][x] is mapping %}
+                        {% for y in standardproducts.rooms[key][x] %} 
+                            <li>{{ y }}</li>
+                            <ul>
+                            {% for z in standardproducts.rooms[key][x][y]["products"] %}
+                                <li>
+                                    {{z.produktnavn}} - {{z.nrf}}
+                                    <form action="/cart" method="POST">
+                                        {{ deleteForm.hidden_tag() }}
+                                        <input id="product_id" name="product_id" type="text" value="{{ z.nrf }}" readonly>
+                                        {{ deleteForm.deleteFromCart }}
+                                    </form>
+                                </li>
+                            {% endfor %}
+                            </ul>
+                        {% endfor %}    
+                    {% endif %}
+                </ul>
+            {% endfor %}
+        {% endfor %}
+    </ul>
+    <form action="/cart" method="POST">
+        {{ form.hidden_tag() }}
+        {{ form.submitOrder }}
+    </form>
+{% else %}
+<p>No products</p>
+{% endif %}
 {% endblock %}

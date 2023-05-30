@@ -13,8 +13,8 @@ class Cart(db.Model):
     rom = db.Column(db.Integer, db.ForeignKey('room.id'))
     kategori = db.Column(db.Integer, db.ForeignKey('category.id'))
 
-    def __str__(self):
-        return self.nrf
+    def __int__(self):
+        return self.id
     
     def __unicode__(self):
-        return self.nrf
+        return self.id

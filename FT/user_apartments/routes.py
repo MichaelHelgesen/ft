@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, url_for
+from flask import Blueprint, render_template, url_for, request, flash
 from flask_login import login_user, login_required, current_user, logout_user
 from FT.models.apartments import Apartments
 from FT.models.room import Room
@@ -6,7 +6,9 @@ from FT.models.collections import Collections, products_collections
 from FT.models.category import Category
 from FT.models.apartmenttype import Apartmenttype
 from FT.models.products import Products
+from FT.models.cart import Cart
 from FT import db
+from FT.forms import webforms
 
 
 user_apartments = Blueprint('user_apartments', __name__, static_folder="static",
@@ -53,17 +55,34 @@ def apartment_product(apartment, room, category):
         user_apartments = Apartments.query.filter_by(id = current_user.apartment_id).first()
         apartmenttype = db.session.query(Apartmenttype).join(Apartments.apartmenttype).filter(Apartments.id == user_apartments.id).first()
         room_id = Room.query.filter(Room.name.like(room), Room.apartmenttype.like(apartmenttype.id)).first()
-        category_id = Category.query.filter_by(room_id = room_id.id).first()
+        #category_id = Category.query.filter_by(room_id = room_id.id).first()
+        category_id = Category.query.filter(Category.name.like(category), Room.apartmenttype.like(apartmenttype.id)).first()
         products = Products.query.join(Category.product).filter(Category.id == category_id.id).all()
-        #print(category_id)
+        #print(category_id2)
         #print(room_id)
         return render_template("category_product.html", category=category, room=room, apartment=apartment, products=products)
 
 @user_apartments.route('/apartment/<string:apartment>/<string:room>/<string:category>/<string:product>', methods=["GET", "POST"])
 @login_required
 def apartment_products(apartment, room, category, product):
+        form = webforms.AddToCart()
         product = Products.query.filter_by(slug = product).first()
-        #product = Products.query.filter_by(slug=slug).first()
+        apartment = Apartments.query.filter_by(apartment_id = apartment).first()
+        apartmenttype = db.session.query(Apartmenttype).join(Apartments.apartmenttype).filter(Apartments.id == apartment.id).first()
+        room_id = Room.query.filter(Room.name.like(room), Room.apartmenttype.like(apartment.id)).first()
+        category_id = Category.query.filter(Category.name.like(category), Room.apartmenttype.like(apartmenttype.id)).first()
         product_id = product.nrf
         image_file = url_for('products.static', filename=str(product_id) + ".jpg")
-        return render_template("single_product.html", product=product, image_file=image_file)
+
+        if request.method == "POST":
+                cart = Cart()
+                cart.leilighet_id = apartment.id
+                cart.produkt_id = product.nrf
+                cart.antall = 1
+                cart.rom = room_id.id
+                cart.kategori = category_id.id
+                db.session.add(cart)
+                db.session.commit()
+                flash("added to cart")
+
+        return render_template("single_product.html", product=product, form=form, image_file=image_file, apartment=apartment, room=room, category=category)

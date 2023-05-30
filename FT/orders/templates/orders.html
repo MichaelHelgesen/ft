@@ -9,29 +9,9 @@
 {% endfor %}
 {{ sample_data }}
 <h2>Orders</h2>
-<ul>
-    {% for key in standardproducts.rooms %}
-        <li>{{ key }}</li>
-        {% for x in standardproducts.rooms[key] %}
-            <ul>
-                {% if standardproducts.rooms[key][x] is mapping %}
-                    {% for y in standardproducts.rooms[key][x] %} 
-                        <li>{{ y }}</li>
-                        <ul>
-                        {% for z in standardproducts.rooms[key][x][y]["products"] %}
-                            <li>
-                                {{z.produktnavn}}
-                            </li>
-                        {% endfor %}
-                        </ul>
-                    {% endfor %}    
-                {% endif %}
-            </ul>
-        {% endfor %}
+{% if orders %}
+    {% for order in orders %}
+        <a href="{{url_for('orders.order_details', order_id=order.id)}}">Ordre-ID: {{ order.id }} - dato: {{ order.dato }}</a><br />
     {% endfor %}
-    </ul>
-<form action="/orders" method="POST">
-    {{ form.hidden_tag() }}
-    {{ form.submitOrder }}
-</form>
+{% endif %}
 {% endblock %}

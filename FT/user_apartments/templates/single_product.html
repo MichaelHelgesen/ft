@@ -8,7 +8,7 @@
 </div>
 {% endfor %}
 {{ sample_data }}
-
+<small>{{ apartment.apartment_id }} - {{ room }} - {{ category }}</small>
 
 <h2>{{ product.produktnavn }} - {{ product.farge }}</h2>
 {% if image_file %}
@@ -41,4 +41,9 @@
 {% if product.enhet %}
     <p>Enhet: {{ product.enhet }}</p>
 {% endif %}
+<form action="#" method="POST">
+    {{ form.hidden_tag() }}
+    <br />
+    {{ form.submitToCart }}
+</form>
 {% endblock %}
