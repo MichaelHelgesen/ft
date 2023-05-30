@@ -203,3 +203,9 @@ def order_details(order_id):
     print(standardproducts)
 
     return render_template("order_details.html", order=order, standardproducts=standardproducts)
+
+@orders.route('/user_orders/', methods=["GET", "POST"])
+@login_required
+def order_list_admin():
+    orders = Orders.query.group_by(Orders.leilighet_id).all()
+    return render_template("orders_admin.html", orders=orders)
