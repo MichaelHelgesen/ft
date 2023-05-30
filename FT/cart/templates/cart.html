@@ -9,16 +9,5 @@
 {% endfor %}
 {{ sample_data }}
 <h2>Cart</h2>
-<ul>
-{% for key in standardproducts %}
-    <li>{{ key }}</li>
-    {% for x in standardproducts[key] %}
-        {% if standardproducts[key][x] is mapping %}
-            {% for y in standardproducts[key][x] %} 
-                <li>{{ y }}</li>
-            {% endfor %}
-        {% endif %}
-    {% endfor %}
-{% endfor %}
-</ul>
+
 {% endblock %}

@@ -9,5 +9,29 @@
 {% endfor %}
 {{ sample_data }}
 <h2>Orders</h2>
-
+<ul>
+    {% for key in standardproducts.rooms %}
+        <li>{{ key }}</li>
+        {% for x in standardproducts.rooms[key] %}
+            <ul>
+                {% if standardproducts.rooms[key][x] is mapping %}
+                    {% for y in standardproducts.rooms[key][x] %} 
+                        <li>{{ y }}</li>
+                        <ul>
+                        {% for z in standardproducts.rooms[key][x][y]["products"] %}
+                            <li>
+                                {{z.produktnavn}}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% endfor %}    
+                {% endif %}
+            </ul>
+        {% endfor %}
+    {% endfor %}
+    </ul>
+<form action="/orders" method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.submitOrder }}
+</form>
 {% endblock %}

@@ -14,15 +14,16 @@ class Orders(db.Model):
     leilighet_id = db.Column(db.Integer, db.ForeignKey('apartments.id'))
     dato = db.Column(db.DateTime(timezone=True), server_default=func.now())
     status = db.relationship("Status", secondary=order_statuses,backref=db.backref('orders', lazy='dynamic'))
+    standardprodukter = db.Column(db.Boolean)
 
     def __repr__(self):
-        return '<Orders %r>' % self.name
+        return '<Orders %r>' % self.id
     
     def __str__(self):
-        return self.name
+        return self.id
     
     def __unicode__(self):
-        return self.name    
+        return self.id    
 
 class Status(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -40,9 +41,11 @@ class Ordreoversikt(db.Model):
     ordre_id = db.Column(db.Integer, db.ForeignKey('orders.id'))
     produkt_id = db.Column(db.String(100), db.ForeignKey('products.nrf'))
     antall = db.Column(db.Integer)
+    rom_id = db.Column(db.Integer, db.ForeignKey('room.id'))
+    kategori_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     
     def __str__(self):
-        return self.name
+        return self.id
     
     def __unicode__(self):
-        return self.name
+        return self.id

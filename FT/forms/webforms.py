@@ -135,3 +135,6 @@ class RemoveFromCollection(FlaskForm):
     product_id = StringField("product_id")
     project_id = StringField("project_id")
     submit3 = SubmitField("Remove From Collection")
+
+class AddOrder(FlaskForm):
+    submitOrder = SubmitField("Add order")
