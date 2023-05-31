@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, url_for, request, flash
+from flask import Blueprint, render_template, url_for, request, flash, redirect
 from flask_login import login_user, login_required, current_user, logout_user
 from FT.models.apartments import Apartments
 from FT.models.room import Room
@@ -12,7 +12,7 @@ from FT.models.orders import Orders, order_statuses, Ordreoversikt, Status
 from FT import db
 import uuid
 from sqlalchemy import func
-from FT.forms.webforms import AddOrder
+from FT.forms.webforms import AddOrder, DeleteOrder
 from FT.models.category import products_category
 
 
@@ -41,11 +41,12 @@ def order_list():
     # print(apartment)
 
     # Ordrer på leiligheten
-    apartment_order = Orders.query.filter_by(leilighet_id=apartment_id).all()
+    apartment_order = Orders.query.filter_by(leilighet_id=apartment_id, standardprodukter=0).all()
     print(apartment_order)
 
-    if not apartment_order:
-        print("NO ORDERS")
+    # Standardordrer på leiligheten
+    standard_apartment_order = Orders.query.filter_by(leilighet_id=apartment_id, standardprodukter=1).all()
+    #print("standard", standard_apartment_order)
 
     # Prosjektet leiligheten er en del av
     project = Project.query.filter_by(id=apartment.project_id).first()
@@ -104,7 +105,7 @@ def order_list():
             group_by(Products.nrf).\
             all()
 
-    # Fylle rom-objektet med kategorier og produkter
+    #Fylle rom-objektet med kategorier og produkter
     for cat in kategori_rom:
         for key in standardproducts["rooms"]:
             # print("key", standardproducts["rooms"][key]["id"])
@@ -117,47 +118,46 @@ def order_list():
     # Ordrestatus
     test = Status.query.filter_by(id = 1).all()
 
-    print(standardproducts)
+    print("STANDARDPRODUKTER", standardproducts)
 
+    if not standard_apartment_order and not apartment_order:
+        for x in current_user.role:
+            if x.name == "user":
+                # Ny ordre
+                new_order = Orders()
+                new_order.leilighet_id = apartment_id
+                new_order.status = test
+                new_order.standardprodukter = 1
+                db.session.add(new_order)
+                #db.session.flush
+                db.session.commit()
+                db.session.refresh(new_order)
 
+                for room in standardproducts["rooms"]:
+                    print(room)
+                    room_id = (standardproducts["rooms"][room]["id"])
+                    for category in standardproducts["rooms"][room]["categories"]:
+                        print(category)
+                        category_id = standardproducts["rooms"][room]["categories"][category]["id"]
+                        for product in standardproducts["rooms"][room]["categories"][category]["products"]:
+                            print(product.produktnavn)
+                            
+                            # Ordredetaljer
+                            new_order_details = Ordreoversikt()
+                            new_order_details.ordre_id = new_order.id
+                            new_order_details.produkt_id = product.nrf
+                            new_order_details.antall = 1
+                            new_order_details.rom_id = room_id
+                            new_order_details.kategori_id = category_id
+                            db.session.add(new_order_details)
+                            db.session.commit()
+                            
+                return redirect(url_for("orders.order_list"))
+                #flash("order added")
 
-    if request.method == "POST":
+    
 
-        # Ny ordre
-        new_order = Orders()
-        new_order.leilighet_id = apartment_id
-        new_order.status = test
-        new_order.standardprodukter = 1
-        db.session.add(new_order)
-        #db.session.flush
-        db.session.commit()
-        db.session.refresh(new_order)
-
-        
-
-        for room in standardproducts["rooms"]:
-            print(room)
-            room_id = (standardproducts["rooms"][room]["id"])
-            for category in standardproducts["rooms"][room]["categories"]:
-                print(category)
-                category_id = standardproducts["rooms"][room]["categories"][category]["id"]
-                for product in standardproducts["rooms"][room]["categories"][category]["products"]:
-                    print(product.produktnavn)
-                    
-                    # Ordredetaljer
-                    new_order_details = Ordreoversikt()
-                    new_order_details.ordre_id = new_order.id
-                    new_order_details.produkt_id = product.nrf
-                    new_order_details.antall = 1
-                    new_order_details.rom_id = room_id
-                    new_order_details.kategori_id = category_id
-                    db.session.add(new_order_details)
-                    db.session.commit()
-        
-        flash("order added")
-
-
-    return render_template("orders.html", standardproducts=standardproducts, form=form, orders=apartment_order)
+    return render_template("orders.html", standard_apartment_order=standard_apartment_order, form=form, orders=apartment_order)
 
 @orders.route('/orders/<int:order_id>', methods=["GET", "POST"])
 @login_required
@@ -207,5 +207,22 @@ def order_details(order_id):
 @orders.route('/user_orders/', methods=["GET", "POST"])
 @login_required
 def order_list_admin():
+    delete_form = DeleteOrder()
+    all_orders = Orders.query.all()
     orders = Orders.query.group_by(Orders.leilighet_id).all()
-    return render_template("orders_admin.html", orders=orders)
+    print(orders)
+
+    if request.method == "POST":
+        order_id = request.form["order_id"]
+        print(order_id)
+        delete_order_status = order_statuses.delete().where(order_statuses.columns.orders_id == order_id)
+        #delete_order_details = Ordreoversikt.__table__.delete().where(Ordreoversikt.ordre_id == order_id)
+        #delete_order = Orders.__table__.delete().where(Orders.id == order_id)
+        db.session.execute(delete_order_status)
+        #db.session.execute(delete_order_details)
+        #db.session.execute(delete_order)
+        db.session.commit()
+        flash("Item deleted")
+        return redirect(url_for("orders.order_list_admin"))        
+
+    return render_template("orders_admin.html", orders=orders, all_orders=all_orders, delete_form=delete_form)

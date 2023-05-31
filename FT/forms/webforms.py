@@ -139,6 +139,10 @@ class RemoveFromCollection(FlaskForm):
 class AddOrder(FlaskForm):
     submitOrder = SubmitField("Add order")
 
+class DeleteOrder(FlaskForm):
+    order_id = StringField("order_id")
+    submitDeleteOrder = SubmitField("Delete order")
+
 class AddToCart(FlaskForm):
     submitToCart = SubmitField("Add to cart")
 

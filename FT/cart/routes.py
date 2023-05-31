@@ -75,7 +75,7 @@ def cart_list():
                 new_order = Orders()
                 new_order.leilighet_id = apartment_id
                 new_order.status = test
-                new_order.standardprodukter = 1
+                new_order.standardprodukter = 0
                 db.session.add(new_order)
                 #db.session.flush
                 db.session.commit()

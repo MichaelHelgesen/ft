@@ -5,15 +5,15 @@ from sqlalchemy.orm import declarative_mixin
 from sqlalchemy.sql import func
 
 order_statuses = db.Table("order_statuses",
-    db.Column("orders_id", db.Integer, db.ForeignKey("orders.id")),
-    db.Column("status_id", db.Integer, db.ForeignKey("status.id"))
+    db.Column("orders_id", db.Integer, db.ForeignKey("orders.id", ondelete='CASCADE')),
+    db.Column("status_id", db.Integer, db.ForeignKey("status.id", ondelete='CASCADE'))
 )
 
 class Orders(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     leilighet_id = db.Column(db.Integer, db.ForeignKey('apartments.id'))
     dato = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    status = db.relationship("Status", secondary=order_statuses,backref=db.backref('orders', lazy='dynamic'))
+    status = db.relationship("Status", secondary=order_statuses, backref=db.backref('orders', lazy='dynamic'))
     standardprodukter = db.Column(db.Boolean)
 
     def __repr__(self):

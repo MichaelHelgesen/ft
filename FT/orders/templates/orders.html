@@ -10,7 +10,17 @@
 {{ sample_data }}
 <h2>Orders</h2>
 {% if orders %}
+<h3>Dine ordrer</h3>
     {% for order in orders %}
+        <a href="{{url_for('orders.order_details', order_id=order.id)}}">Ordre-ID: {{ order.id }} - dato: {{ order.dato }}</a><br />
+    {% endfor %}
+{% else %}
+<p>Du har ingen ordrer</p>
+{% endif %}
+{% if standard_apartment_order %}
+<h3>Standardvarer</h3>
+<p>Produktene i denne ordren vil automatisk slettes om du velger et tilvalg i samme kategori.</p>
+    {% for order in standard_apartment_order %}
         <a href="{{url_for('orders.order_details', order_id=order.id)}}">Ordre-ID: {{ order.id }} - dato: {{ order.dato }}</a><br />
     {% endfor %}
 {% endif %}
