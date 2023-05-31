@@ -7,8 +7,8 @@ import pandas as pd
 from functools import wraps
 from FT.models.apartments import Apartments
 from FT.models.projects import Project
-from FT.models.apartmenttype import Apartmenttype
-from FT.models.apartments import apartments_apartmenttypes
+from FT.models.apartmenttype import Apartmenttyp
+from FT.models.apartments import apartments_apartmenttypes, Apartmentdata
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, current_user, logout_user
 import csv
@@ -27,6 +27,8 @@ def str_to_slug(string, delimeter = "-"):
 # Landingsside for alle leiligheter
 @apartments.route('/apartments', methods=["GET", "POST"])
 def apartments_list():
+    
+    import_form = webforms.ImportForm()
 
     # Alle leiligheter
     apartments = Apartments.query.all()
@@ -46,7 +48,7 @@ def apartments_list():
     
     # Hvis nytt prosjekt registreres via skjema
     if request.method == "POST":
-        if form.validate_on_submit():
+        if form.submit_apartment.data and form.validate():
             apartment_id = form.apartment_id.data.upper()  
             apartment = Apartments.query.filter_by(apartment_id = apartment_id).first()
             if apartment is None:
@@ -63,12 +65,34 @@ def apartments_list():
             else:
                 flash("apartment name already exists")
                 return redirect(url_for("apartments.apartments_list"))
+        
+        if import_form.submit.data and import_form.validate():
+            flash("import")
+            print(request.files.get('file'))
+            df = pd.read_excel(request.files.get('file'))
+            #test = list(df.columns.values)
+            #print(test)
+            #new_apartment = Apartments()
+            #new_apartment_data = Apartmentdata()
+
+            for x in df.columns.values:
+                if x != "Rom":
+                    print(x)
+                    for index in df.index:
+                        print(df["Rom"][index])
+                        print(df[x][index])
+            
+            """ for index in df.index:
+                print(df["Rom"][index])
+                print(df[2][index]) """
+        
         else:
             flash("Something went wrong")
-            return render_template("apartments.html", form=form)
+            return render_template("apartments.html", form=form, import_form=import_form)
+        
     if projects:
-        return render_template("apartments.html", form=form, apartments=apartments, projects=projects)
-    return render_template("apartments.html", form=form, apartments=apartments)
+        return render_template("apartments.html", import_form=import_form, form=form, apartments=apartments, projects=projects)
+    return render_template("apartments.html", form=form, apartments=apartments, import_form=import_form)
 
 
 # Landingsside leilighet
