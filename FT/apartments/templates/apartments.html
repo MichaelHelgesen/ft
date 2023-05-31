@@ -24,6 +24,12 @@
     {{ form.project }}
     {% endif %}
     <br />
-    {{ form.submit }}
+    {{ form.submit_apartment }}
+</form>
+<form action="/apartments" method="POST" enctype=multipart/form-data>
+    {{ import_form.hidden_tag() }}
+    {{ import_form.file.label }}
+    {{ import_form.file }}
+    {{ import_form.submit }}
 </form>
 {% endblock %}

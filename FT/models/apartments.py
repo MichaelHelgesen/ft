@@ -24,3 +24,10 @@ class Apartments(HasSlug, db.Model):
     apartmenttype_id = db.Column(db.Integer, db.ForeignKey('apartmenttype.id'))
     users = db.relationship('Users', backref='apartments')
     apartmenttype = db.relationship("Apartmenttype", secondary=apartments_apartmenttypes, backref=db.backref('apartments', lazy='dynamic'))
+
+class Apartmentdata(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    datatype = db.Column(db.String(200), nullable=False)
+    verdi = db.Column(db.Integer)
+    apartment_id = db.Column(db.Integer, db.ForeignKey('apartments.id'))
+
