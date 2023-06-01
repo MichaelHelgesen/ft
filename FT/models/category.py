@@ -23,6 +23,7 @@ class Category(HasSlug, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     room_id = db.Column(db.Integer, db.ForeignKey('room.id'))
+    apartment_data = db.Column(db.String, db.ForeignKey('apartmentdata.id'))
     product = db.relationship("Products", secondary=products_category, backref=db.backref('category', lazy='dynamic'))
 
     def __repr__(self):

@@ -25,5 +25,10 @@
     <br />
     {{ form.submit }}
 </form>
+{% if apartmentdata %}
+    {% for data in apartmentdata %}
+        <div>{{ data.datatype }} - {{ data.verdi }}</div>
+    {% endfor %}
+{% endif %}
 <a href="{{url_for('apartments.delete_apartment', id=id)}}">Delete apartment</a>
 {% endblock %}

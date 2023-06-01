@@ -10,6 +10,7 @@ import urllib
 from functools import wraps
 from FT.models.collections import Collections, products_collections
 from FT.models.apartmenttype import Apartmenttype
+from FT.models.apartments import Apartments, Apartmentdata
 from FT.models.projects import Project
 from FT.models.products import Products
 from FT.models.room import Room
@@ -79,8 +80,11 @@ def collection(slug):
     apartmenttype_rooms = Room.query.filter_by(apartmenttype = apartmentType.id).all()
     print("APARTMENT ROOMS", apartmenttype_rooms)
     current_apartmenttype_project = Project.query.filter_by(id = apartmentType.project_id).first()
-    standard_apartmenttype = Apartmenttype.query.filter_by(project_id=current_apartmenttype_project.id, is_standard=1).first()
-    print("STANDARD", standard_apartmenttype)
+    print("CURRENT APARTMENTTYPE PROJECT", current_apartmenttype_project)
+    standard_apartmenttype = None
+    if current_apartmenttype_project:
+        standard_apartmenttype = Apartmenttype.query.filter_by(project_id=current_apartmenttype_project.id, is_standard=1).first()
+        print("STANDARD", standard_apartmenttype)
     if projects:
         form = webforms.AddApartmentTypeForm()
         current_apartmenttype_project = Project.query.filter_by(id = apartmentType.project_id).first()
@@ -139,7 +143,6 @@ def collection(slug):
         else:
             flash("Error")
             return redirect(url_for("product_col.collections"))
-        
 
     return render_template("collection.html", standard=standard_apartmenttype, apartmenttype=apartmentType, form=form, projects=projects, room_form=room_form, apartmenttype_rooms=apartmenttype_rooms)
 
@@ -165,21 +168,32 @@ def collection_room(apartmenttype, slug):
 # PRODUKT
 @product_col.route("/collections/<string:apartmenttype>/<string:room>/<string:slug>", methods=["GET", "POST"])
 def room_category(apartmenttype, room, slug):
-    
     addForm = webforms.AddToCollection()
     removeForm = webforms.RemoveFromCollection()
     apartmenttype_id = Apartmenttype.query.filter_by(slug=apartmenttype).first()
+    print("APARTMENTTYPE", apartmenttype_id)
+    apartment_project_id = apartmenttype_id.project_id
     room_id = Room.query.filter(Room.slug.like(room), Room.apartmenttype.like(apartmenttype_id.id)).first()
-
+    print ("APARTMENT PROJECT ID", apartment_project_id)
     category = Category.query.filter(Category.room_id.like(room_id.id), Category.slug.like(slug)).first()
     #collections = Collections.query.all()
     #product_collection = db.Table.query(products_collections).query.all()
-    
+
+    # Apartments in project
+    apartments_in_project = Apartments.query.filter_by(project_id=apartment_project_id).all()
+    print("APARTMENTS IN PROJECT", apartments_in_project)
+
+    leilighetsdata = db.session.query(Apartmentdata).join(Apartments).filter(Apartments.project_id.like(apartment_project_id)).with_entities(Apartmentdata.datatype).distinct().all()
+
+    test2 = Apartments.query.with_entities(Apartments.project_id).distinct().all()
+    print("TEST2", test2)
+
+
     products = Products.query.all()
     projects = Project.query.all()
     filtered = []
     
-    chosenProducts = db.session.query(Products).join(Category.product).filter(Category.id == category.id).all()
+    chosenProducts = db.session.query(Products).join(Category.product).filter(Category.id == category.id).distinct()
     productsAvaliable = db.session.query(Products).outerjoin(products_category, Products.nrf == products_category.columns.products_id).filter(products_category.columns.products_id == None).all()
 
     for x in products:
@@ -216,10 +230,32 @@ def room_category(apartmenttype, room, slug):
             #form.project.choices.insert(0,("", "Ingen prosjekt valgt"))
     #else:
         form = webforms.AddCollectionNoProjectForm()
+    
+    projectform = webforms.AddApartmentTypeForm()
+
+    if projects:
+        #current_apartmenttype_project = Project.query.filter_by(id = apartmentType.project_id).first()
+        #updateForm = webforms.UpdateCollectionForm()
+        projectform.project.choices = [(project.id, project.name.title()) for project in projects]
+        projectform.project.choices.insert(0,("", "Ingen prosjekt valgt"))
   
     #form.collection_name.data = collection.name
     
     if request.method == "POST":
+        if projectform.submit.data:
+            #apartmenttype_id.name = request.form["apartmenttype_name"].upper()
+            #apartmenttype_id.slug = str_to_slug(request.form["apartmenttype_name"])
+            #print("STANDARD--", form["set_standard"].data)
+            #print("check", request.form.getlist('set_standard') )
+            """ if request.form.getlist('set_standard'):
+                apartmenttype_id.is_standard = True
+            else:
+                apartmenttype_id.is_standard = False """
+            if projects:
+                apartmenttype_id.project_id = request.form["project"]
+            db.session.commit()
+            flash("Collection updated!")
+            return redirect(request.url)
 
         if addForm.submit2.data and addForm.validate():
             print(addForm.data)
@@ -255,7 +291,7 @@ def room_category(apartmenttype, room, slug):
             return redirect(url_for("product_col.collections"))
         
 
-    return render_template("category.html", category=category, form=form, projects=projects, products=products, addForm=addForm, chosenProducts=chosenProducts, removeForm=removeForm, productsAvaliable=filtered)
+    return render_template("category.html", leilighetsdata=leilighetsdata, apartmenttype=apartmenttype, room=room, slug=slug, projectform=projectform, category=category, form=form, projects=projects, products=products, addForm=addForm, chosenProducts=chosenProducts, removeForm=removeForm, productsAvaliable=filtered, project_id=apartment_project_id)
 
 @product_col.route("/collections/delete/<string:name>", methods=["GET", "POST"])
 def delete_col(name):

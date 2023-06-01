@@ -22,6 +22,7 @@ products_collections = db.Table("products_collections",
 class Collections(HasSlug, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
+    apartment_data = db.Column(db.String(200))
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     product = db.relationship("Products", secondary=products_collections, backref=db.backref('collections', lazy='dynamic'))
 

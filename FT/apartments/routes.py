@@ -3,9 +3,10 @@ from FT.forms import webforms
 from FT import db, app
 import flask_excel as excel
 import io
+import numpy as np
 import pandas as pd
 from functools import wraps
-from FT.models.apartments import Apartments
+from FT.models.apartments import Apartments, Apartmentdata
 from FT.models.projects import Project
 from FT.models.apartmenttype import Apartmenttype
 from FT.models.apartments import apartments_apartmenttypes, Apartmentdata
@@ -76,30 +77,27 @@ def apartments_list():
             for x in df.columns.values:
                 if x != "Rom":
                     print(x)
-                    """ import_apartment = Apartments()
+                    import_apartment = Apartments()
                     import_apartment.apartment_id = x
                     import_apartment.slug = str_to_slug(x)
                     db.session.add(import_apartment)
                     db.session.commit()
-                    db.session.refresh(import_apartment) """
+                    db.session.refresh(import_apartment)
                     for index in df.index:
-                        """ import_apartment_data = Apartmentdata()
+                        import_apartment_data = Apartmentdata()
                         import_apartment_data.datatype = df["Rom"][index]
-                        import_apartment_data.verdi = 1
+                        import_apartment_data.verdi = int(df[x][index])
                         import_apartment_data.apartment_id = import_apartment.id
                         db.session.add(import_apartment_data)
-                        db.session.commit() """
+                        db.session.commit()
                         #id = db.Column(db.Integer, primary_key=True)
                         #datatype = db.Column(db.String(200), nullable=False)
                         #verdi = db.Column(db.Integer)
                         #apartment_id = db.Column(db.I
                         print(df["Rom"][index])
-                        print(df[x][index].value)
+                        print(int(df[x][index]))
             return redirect(url_for("apartments.apartments_list"))  
           
-            """ for index in df.index:
-                print(df["Rom"][index])
-                print(df[2][index]) """
         
         else:
             flash("Something went wrong")
@@ -117,6 +115,10 @@ def apartment_edit(slug):
     apartment = Apartments.query.filter_by(slug=slug).first()
     apartment_id = apartment.apartment_id.upper()
     id = apartment.id
+
+    # Hent leilighetsdata
+    apartment_data = Apartmentdata.query.filter_by(apartment_id = id).all()
+    print(apartment_data)
 
     # Hent alle prosjekter
     projects = Project.query.all()
@@ -233,7 +235,7 @@ def apartment_edit(slug):
             flash("Error apartment")
             return redirect(url_for("apartments.apartments_list"))
     
-    return render_template("apartment_edit.html", apartment_id=apartment_id, id=id, form=form, slug=slug, projects=projects, apartmenttypes=apartmenttypes)
+    return render_template("apartment_edit.html", apartment_id=apartment_id, id=id, form=form, slug=slug, projects=projects, apartmenttypes=apartmenttypes, apartmentdata=apartment_data)
 
 # Sletting av leilighet
 @apartments.route("/apartments/delete/<int:id>")

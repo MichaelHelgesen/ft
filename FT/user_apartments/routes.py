@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, url_for, request, flash
 from flask_login import login_user, login_required, current_user, logout_user
-from FT.models.apartments import Apartments
+from FT.models.apartments import Apartments, Apartmentdata
 from FT.models.room import Room
 from FT.models.collections import Collections, products_collections
 from FT.models.category import Category
@@ -24,7 +24,9 @@ def apartment_list():
 @user_apartments.route('/apartment/<string:apartment>', methods=["GET", "POST"])
 @login_required
 def apartment_rooms(apartment):
+        # Hent leilighetsdata
         user_apartments = Apartments.query.filter_by(id = current_user.apartment_id).first()
+        apartment_data = Apartmentdata.query.filter_by(apartment_id = user_apartments.id).all()
         apartmenttype = db.session.query(Apartmenttype).join(Apartments.apartmenttype).filter(Apartments.id == user_apartments.id).first()
         #print(apartmenttype.name)
         #room_id = Room.query.filter(Room.slug.like(room), Room.apartmenttype.like(apartmenttype_id.id)).first()
@@ -34,7 +36,7 @@ def apartment_rooms(apartment):
         user_rooms = Room.query.filter_by(apartmenttype = apartmenttype.id).all()
         print(user_rooms)
         print(user_apartments.id)
-        return render_template("apartment_rooms.html", user_rooms=user_rooms, apartment=apartment)
+        return render_template("apartment_rooms.html", user_rooms=user_rooms, apartment=apartment, apartmentdata=apartment_data)
 
 @user_apartments.route('/apartment/<string:apartment>/<string:room>', methods=["GET", "POST"])
 @login_required

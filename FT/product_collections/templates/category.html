@@ -9,6 +9,22 @@
 </div>
 {% endfor %}
 {{ sample_data }}
+<p>{{ apartmenttype }} - {{ room }} - {{ slug }}</p>
+{% if project_id %}
+<div>
+    <h3>Velg enhetstype / mål / arean til denne kategorien</h3>
+</div>
+{% else %}
+<p>Et prosjekt med leiligheter må angis for å kunne angi mål / verdier for denne leilighetstypen</p>
+<form action="#" method="POST">
+    {{ projectform.hidden_tag() }}
+    {{ projectform.project.label }}
+    {{ projectform.project }}
+    
+    <br />
+    {{ projectform.submit }}
+</form>
+{% endif %}
 <div style="display: flex">
     <div>
         <h3>Tilgjengelige produkter</h3>
