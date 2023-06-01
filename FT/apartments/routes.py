@@ -7,7 +7,7 @@ import pandas as pd
 from functools import wraps
 from FT.models.apartments import Apartments
 from FT.models.projects import Project
-from FT.models.apartmenttype import Apartmenttyp
+from FT.models.apartmenttype import Apartmenttype
 from FT.models.apartments import apartments_apartmenttypes, Apartmentdata
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, current_user, logout_user
@@ -72,16 +72,31 @@ def apartments_list():
             df = pd.read_excel(request.files.get('file'))
             #test = list(df.columns.values)
             #print(test)
-            #new_apartment = Apartments()
-            #new_apartment_data = Apartmentdata()
 
             for x in df.columns.values:
                 if x != "Rom":
                     print(x)
+                    """ import_apartment = Apartments()
+                    import_apartment.apartment_id = x
+                    import_apartment.slug = str_to_slug(x)
+                    db.session.add(import_apartment)
+                    db.session.commit()
+                    db.session.refresh(import_apartment) """
                     for index in df.index:
+                        """ import_apartment_data = Apartmentdata()
+                        import_apartment_data.datatype = df["Rom"][index]
+                        import_apartment_data.verdi = 1
+                        import_apartment_data.apartment_id = import_apartment.id
+                        db.session.add(import_apartment_data)
+                        db.session.commit() """
+                        #id = db.Column(db.Integer, primary_key=True)
+                        #datatype = db.Column(db.String(200), nullable=False)
+                        #verdi = db.Column(db.Integer)
+                        #apartment_id = db.Column(db.I
                         print(df["Rom"][index])
-                        print(df[x][index])
-            
+                        print(df[x][index].value)
+            return redirect(url_for("apartments.apartments_list"))  
+          
             """ for index in df.index:
                 print(df["Rom"][index])
                 print(df[2][index]) """
