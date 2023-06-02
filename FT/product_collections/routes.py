@@ -169,6 +169,8 @@ def collection_room(apartmenttype, slug):
 @product_col.route("/collections/<string:apartmenttype>/<string:room>/<string:slug>", methods=["GET", "POST"])
 def room_category(apartmenttype, room, slug):
     addForm = webforms.AddToCollection()
+    # Skjema for valg av leilighetsdata
+    addApartmentDataForm = webforms.AddApartmentDataToCategory()
     removeForm = webforms.RemoveFromCollection()
     apartmenttype_id = Apartmenttype.query.filter_by(slug=apartmenttype).first()
     print("APARTMENTTYPE", apartmenttype_id)
@@ -284,14 +286,33 @@ def room_category(apartmenttype, room, slug):
                 collection.project_id = request.form["project"]
             db.session.commit()
             flash("Collection updated!")
-            return redirect(url_for("product_col.collections"))
-                
+            return redirect(url_for("product_col.collections"))     
+
+        if addApartmentDataForm.submitData.data:
+            choise = request.form["ApartmentData"]
+            if choise != "Velg enhetstype":
+                print(choise)
+                category.apartment_data = choise
+            else:
+                category.apartment_data = None
+            db.session.commit()
+            flash("enhetstype valgt")
+                   
         else:
             flash("Error")
-            return redirect(url_for("product_col.collections"))
-        
+            return redirect(request.url)
+    
+    print(category.apartment_data)
 
-    return render_template("category.html", leilighetsdata=leilighetsdata, apartmenttype=apartmenttype, room=room, slug=slug, projectform=projectform, category=category, form=form, projects=projects, products=products, addForm=addForm, chosenProducts=chosenProducts, removeForm=removeForm, productsAvaliable=filtered, project_id=apartment_project_id)
+    addApartmentDataForm.ApartmentData.choices = [(data.datatype) for data in leilighetsdata]
+    
+    if category.apartment_data:
+        addApartmentDataForm.ApartmentData.default = category.apartment_data
+        addApartmentDataForm.ApartmentData.process([])
+    else:
+        addApartmentDataForm.ApartmentData.choices.insert(0, ("Velg enhetstype"))
+    
+    return render_template("category.html", addApartmentDataForm=addApartmentDataForm, leilighetsdata=leilighetsdata, apartmenttype=apartmenttype, room=room, slug=slug, projectform=projectform, category=category, form=form, projects=projects, products=products, addForm=addForm, chosenProducts=chosenProducts, removeForm=removeForm, productsAvaliable=filtered, project_id=apartment_project_id)
 
 @product_col.route("/collections/delete/<string:name>", methods=["GET", "POST"])
 def delete_col(name):

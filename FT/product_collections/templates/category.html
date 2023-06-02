@@ -13,6 +13,16 @@
 {% if project_id %}
 <div>
     <h3>Velg enhetstype / mål / arean til denne kategorien</h3>
+    {% for data in leilighetsdata %}
+        {{ data.datatype }}
+    {% endfor %}
+    <form action="#" method="POST">
+        {{ addApartmentDataForm.hidden_tag() }}
+        {{ addApartmentDataForm.ApartmentData.label }}
+        {{ addApartmentDataForm.ApartmentData }}<br/>
+        <br />
+        {{ addApartmentDataForm.submitData }}
+    </form>
 </div>
 {% else %}
 <p>Et prosjekt med leiligheter må angis for å kunne angi mål / verdier for denne leilighetstypen</p>

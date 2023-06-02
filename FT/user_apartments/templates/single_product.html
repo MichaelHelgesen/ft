@@ -38,9 +38,16 @@
 {% if product.farge %}
     <p>Farge: {{ product.farge }}</p>
 {% endif %}
+{% if product.pris %}
+    <p>Pris per enhet: {{ product.pris }}</p>
+{% endif %}
 {% if product.enhet %}
     <p>Enhet: {{ product.enhet }}</p>
 {% endif %}
+{% if product.enhet %}
+    <p>Enheter i din leilighet: {{ apartment_data_value.verdi }} {{ product.enhet }}</p>
+{% endif %}
+<h3>PRIS: {{ apartment_data_value.verdi * product.pris }}</h3>
 <form action="#" method="POST">
     {{ form.hidden_tag() }}
     <br />

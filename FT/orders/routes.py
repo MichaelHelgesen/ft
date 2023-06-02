@@ -26,7 +26,8 @@ orders = Blueprint('orders', __name__, static_folder="static",
 def order_list():
 
     standardproducts = {
-        "rooms": {}
+        "rooms": {},
+        "totalPrice": 0
     }
 
     #Skjema
@@ -112,8 +113,15 @@ def order_list():
             if standardproducts["rooms"][key]["id"] == cat.room_id:
                 standardproducts["rooms"][key]["categories"][cat.name] = {
                     "id": cat.id,
-                        "products": get_products([cat.id])
+                    "products": []
                 }
+                stand_prod = get_products([cat.id])
+                for prod in stand_prod:
+                    standardproducts["rooms"][key]["categories"][cat.name]["products"].append({
+                        "product": prod,
+                        "price": prod.pris,
+                        "num": cat.antall
+                    })
     
     # Ordrestatus
     test = Status.query.filter_by(id = 1).all()
@@ -140,13 +148,14 @@ def order_list():
                         print(category)
                         category_id = standardproducts["rooms"][room]["categories"][category]["id"]
                         for product in standardproducts["rooms"][room]["categories"][category]["products"]:
-                            print(product.produktnavn)
+                            print("GFGFFG", product)
                             
                             # Ordredetaljer
                             new_order_details = Ordreoversikt()
                             new_order_details.ordre_id = new_order.id
-                            new_order_details.produkt_id = product.nrf
-                            new_order_details.antall = 1
+                            new_order_details.produkt_id = product["product"].nrf
+                            new_order_details.pris = product.price
+                            new_order_details.antall = product.num
                             new_order_details.rom_id = room_id
                             new_order_details.kategori_id = category_id
                             db.session.add(new_order_details)
@@ -168,7 +177,8 @@ def order_details(order_id):
     ordreoversikt = Ordreoversikt.query.filter_by(ordre_id = order.id).all()
 
     standardproducts = {
-            "rooms": {}
+            "rooms": {},
+            "totalPrice": 0
         }
 
     for item in ordreoversikt:
@@ -196,9 +206,13 @@ def order_details(order_id):
             standardproducts["rooms"][room.name]["categories"][categories.name]["products"][product.nrf] = {
                 #"nrf": product.nrf,
                 "antall": item.antall,
-                "navn": product.produktnavn
+                "navn": product.produktnavn,
+                "price": item.pris * item.antall,
             }
+            standardproducts["totalPrice"] += item.antall * item.pris
     
+    
+
     
     print(standardproducts)
 

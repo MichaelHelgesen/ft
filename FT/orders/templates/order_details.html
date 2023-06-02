@@ -23,6 +23,7 @@
                             <li>
                                 <b>{{ standardproducts.rooms[key][x][y]["products"][z]["navn"] }}</b><br/>
                                 Antall: {{ standardproducts.rooms[key][x][y]["products"][z]["antall"] }}<br />
+                                Pris: {{ standardproducts.rooms[key][x][y]["products"][z]["price"] }}<br/>
                                 NRF: {{ z }}
                             </li>
                         {% endfor %}
@@ -33,4 +34,5 @@
         {% endfor %}
     {% endfor %}
 </ul>
+<h3>Totalpris: {{ standardproducts.totalPrice }}</h3>
 {% endblock %}

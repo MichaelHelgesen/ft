@@ -41,6 +41,7 @@ class Ordreoversikt(db.Model):
     ordre_id = db.Column(db.Integer, db.ForeignKey('orders.id'))
     produkt_id = db.Column(db.String(100), db.ForeignKey('products.nrf'))
     antall = db.Column(db.Integer)
+    pris = db.Column(db.Integer)
     rom_id = db.Column(db.Integer, db.ForeignKey('room.id'))
     kategori_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     

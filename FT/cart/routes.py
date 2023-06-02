@@ -33,7 +33,8 @@ def cart_list():
     apartment_id = current_user.apartment_id
     
     standardproducts = {
-            "rooms": {}
+            "rooms": {},
+            "totalPrice": 0
         }
 
     cart_items = Cart.query.filter_by(leilighet_id = current_user.apartment_id).all()
@@ -42,7 +43,7 @@ def cart_list():
         room = Room.query.filter_by(id=item.rom).first()
         standardproducts["rooms"][room.name] = {
             "id": room.id,
-            "categories": {}
+            "categories": {},
         }
     
     for item in cart_items:
@@ -59,7 +60,14 @@ def cart_list():
         categories = Category.query.filter_by(id=item.kategori).first()
         product = Products.query.filter_by(nrf=item.produkt_id).first()
         if item.id:
-            standardproducts["rooms"][room.name]["categories"][categories.name]["products"].append(product)
+            standardproducts["rooms"][room.name]["categories"][categories.name]["products"].append({
+                "product": product,
+                "price": product.pris,
+                "num": item.antall,
+                "unit": product.enhet
+            })
+            standardproducts["totalPrice"] += item.antall * product.pris
+
     
     
     print(standardproducts)
@@ -90,13 +98,14 @@ def cart_list():
                         print(category)
                         category_id = standardproducts["rooms"][room]["categories"][category]["id"]
                         for product in standardproducts["rooms"][room]["categories"][category]["products"]:
-                            print(product.produktnavn)
+                            print(product["product"])
                             
                             # Ordredetaljer
                             new_order_details = Ordreoversikt()
                             new_order_details.ordre_id = new_order.id
-                            new_order_details.produkt_id = product.nrf
-                            new_order_details.antall = 1
+                            new_order_details.pris = product["price"]
+                            new_order_details.produkt_id = product["product"].nrf
+                            new_order_details.antall = product["num"]
                             new_order_details.rom_id = room_id
                             new_order_details.kategori_id = category_id
                             db.session.add(new_order_details)

@@ -149,3 +149,7 @@ class AddToCart(FlaskForm):
 class DeleteFromCart(FlaskForm):
     product_id = StringField("product_id")
     deleteFromCart = SubmitField("Delete from cart")
+
+class AddApartmentDataToCategory(FlaskForm):
+    ApartmentData = SelectField('apartmentdata')
+    submitData = SubmitField("Add data")

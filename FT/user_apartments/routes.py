@@ -71,20 +71,36 @@ def apartment_products(apartment, room, category, product):
         product = Products.query.filter_by(slug = product).first()
         apartment = Apartments.query.filter_by(apartment_id = apartment).first()
         apartmenttype = db.session.query(Apartmenttype).join(Apartments.apartmenttype).filter(Apartments.id == apartment.id).first()
-        room_id = Room.query.filter(Room.name.like(room), Room.apartmenttype.like(apartment.id)).first()
-        category_id = Category.query.filter(Category.name.like(category), Room.apartmenttype.like(apartmenttype.id)).first()
+        room_id = Room.query.filter(Room.name.like(room), Room.apartmenttype.like(apartmenttype.id)).first()
+        category_id = db.session.query(Category).join(Room).filter(Category.name == category).filter(Room.apartmenttype == apartmenttype.id).first()
+        #category_id = Category.query.filter(Category.name.like(category), Room.apartmenttype.like(apartmenttype.id)).first()
         product_id = product.nrf
         image_file = url_for('products.static', filename=str(product_id) + ".jpg")
+
+        category_apartmentdata = category_id.apartment_data
+        
+        apartment_data_value = Apartmentdata.query.filter_by(apartment_id=apartment.id, datatype=category_apartmentdata).first()
+        
+        print("ROM", room)
+        print("ROM-ID", room_id.id)
+        print("APARTMENT-ID", apartment.id)
+        print("APARTMENTTYPE", apartmenttype.id)
+        print("CATEGORY", category)
+        print("CATEGORY ID", category_id)
+        print(category_apartmentdata)
+        
+        print(apartment_data_value)
+        
 
         if request.method == "POST":
                 cart = Cart()
                 cart.leilighet_id = apartment.id
                 cart.produkt_id = product.nrf
-                cart.antall = 1
+                cart.antall = apartment_data_value.verdi
                 cart.rom = room_id.id
                 cart.kategori = category_id.id
                 db.session.add(cart)
                 db.session.commit()
                 flash("added to cart")
 
-        return render_template("single_product.html", product=product, form=form, image_file=image_file, apartment=apartment, room=room, category=category)
+        return render_template("single_product.html", apartment_data_value=apartment_data_value, product=product, form=form, image_file=image_file, apartment=apartment, room=room, category=category)

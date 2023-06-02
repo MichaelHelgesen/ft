@@ -21,10 +21,12 @@
                             <ul>
                             {% for z in standardproducts.rooms[key][x][y]["products"] %}
                                 <li>
-                                    {{z.produktnavn}} - {{z.nrf}}
+                                    {{ z.product.produktnavn }} - {{ z.product.nrf }}<br/>
+                                    Antall: {{ z.num }} {{ z.unit }}<br/>
+                                    Pris: {{ z.num * z.price}}
                                     <form action="/cart" method="POST">
                                         {{ deleteForm.hidden_tag() }}
-                                        <input id="product_id" name="product_id" type="text" value="{{ z.nrf }}" readonly>
+                                        <input id="product_id" name="product_id" type="text" value="{{ z.product.nrf }}" readonly>
                                         {{ deleteForm.deleteFromCart }}
                                     </form>
                                 </li>
@@ -36,6 +38,7 @@
             {% endfor %}
         {% endfor %}
     </ul>
+    <h3>Totalpris: {{ standardproducts.totalPrice }}</h3>
     <form action="/cart" method="POST">
         {{ form.hidden_tag() }}
         {{ form.submitOrder }}

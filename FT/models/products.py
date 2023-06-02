@@ -20,6 +20,7 @@ class Products(HasSlug, db.Model):
     nrf = db.Column(db.String(100), nullable=False, primary_key=True, unique=True)
     leverandor = db.Column(db.String)
     hovedkategori = db.Column(db.String)
+    pris = db.Column(db.Integer)
     underkategori = db.Column(db.String)
     kategori = db.Column(db.String)
     produktnavn = db.Column(db.String)
