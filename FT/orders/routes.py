@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, url_for, request, flash, redirect
 from flask_login import login_user, login_required, current_user, logout_user
-from FT.models.apartments import Apartments
+from FT.models.apartments import Apartments, Apartmentdata
 from FT.models.room import Room
 from FT.models.collections import Collections, products_collections
 from FT.models.category import Category
@@ -9,7 +9,10 @@ from FT.models.products import Products
 from FT.models.orders import Orders
 from FT.models.projects import Project
 from FT.models.orders import Orders, order_statuses, Ordreoversikt, Status
-from FT import db
+from FT import db, app
+import flask_excel as excel
+import pandas as pd
+import sqlite3
 import uuid
 from sqlalchemy import func
 from FT.forms.webforms import AddOrder, DeleteOrder
@@ -106,8 +109,11 @@ def order_list():
             group_by(Products.nrf).\
             all()
 
+
     #Fylle rom-objektet med kategorier og produkter
     for cat in kategori_rom:
+        print(cat.apartment_data)
+        antall = Apartmentdata.query.filter(Apartmentdata.datatype == cat.apartment_data, Apartmentdata.apartment_id == apartment_id).first()
         for key in standardproducts["rooms"]:
             # print("key", standardproducts["rooms"][key]["id"])
             if standardproducts["rooms"][key]["id"] == cat.room_id:
@@ -120,7 +126,7 @@ def order_list():
                     standardproducts["rooms"][key]["categories"][cat.name]["products"].append({
                         "product": prod,
                         "price": prod.pris,
-                        "num": cat.antall
+                        "num": antall.verdi
                     })
     
     # Ordrestatus
@@ -148,14 +154,13 @@ def order_list():
                         print(category)
                         category_id = standardproducts["rooms"][room]["categories"][category]["id"]
                         for product in standardproducts["rooms"][room]["categories"][category]["products"]:
-                            print("GFGFFG", product)
                             
                             # Ordredetaljer
                             new_order_details = Ordreoversikt()
                             new_order_details.ordre_id = new_order.id
                             new_order_details.produkt_id = product["product"].nrf
-                            new_order_details.pris = product.price
-                            new_order_details.antall = product.num
+                            new_order_details.pris = product["price"]
+                            new_order_details.antall = product["num"]
                             new_order_details.rom_id = room_id
                             new_order_details.kategori_id = category_id
                             db.session.add(new_order_details)
@@ -240,3 +245,40 @@ def order_list_admin():
         return redirect(url_for("orders.order_list_admin"))        
 
     return render_template("orders_admin.html", orders=orders, all_orders=all_orders, delete_form=delete_form)
+
+
+@orders.route('/orders/download/<int:id>', methods=['GET'])
+def download_data(id):
+    #products = products.query.all()
+    
+    """ con = sqlite3.connect("instance/ft.db")
+    
+    con.row_factory = sqlite3.Row #Gir oss navn på kolonner 
+    cur = con.cursor()
+    cur.execute("select * from products")
+    products = cur.fetchall()
+
+    
+    
+    for product in products:
+        print(dict(product)["nrf"])
+        product_nrf.append(dict(product)["nrf"])
+        product_names.append(dict(product)["produktnavn"])
+
+    print(product_nrf) """
+
+    d = {
+        "rooms": ["a"],
+        "categorys": ["a"],
+        "product_name": ["a"],
+        "product_nrf": ["a"],
+        "product_price": ["a"],
+        "apartment": ["a"]
+    }
+
+    excel.init_excel(app)
+    extension_type = "xls"
+    filename = "ordre" + "." + extension_type
+    #d = {'nrf': ["a"], "Produktnavn": ["d"]}
+
+    return excel.make_response_from_dict(d, file_type=extension_type, file_name=filename)
