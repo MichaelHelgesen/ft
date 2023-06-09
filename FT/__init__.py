@@ -13,6 +13,10 @@ app = Flask(__name__)
 excel.init_excel(app)
 # configure the SQLite database, relative to the app instance folder
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///ft.db"
+app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
+app.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.png', '.gif']
+app.config['UPLOAD_PATH'] = 'ft/static/users'
+
 # initialize the app with the extension
 db.init_app(app)
 

@@ -108,7 +108,12 @@ def collection(slug):
         
         if room_form.submit_room.data and room_form.validate():
             new_room = Room()
+
             new_room.name = request.form["room_name"]
+            if request.form.getlist('file_upload'):
+                new_room.file_upload = True
+            else:
+                new_room.file_upload = False
             new_room.slug = str_to_slug(request.form["room_name"])
             new_room.apartmenttype = apartmentType.id
             db.session.add(new_room)

@@ -1,10 +1,36 @@
 {% extends "base.html" %} 
 
 {% block content%}
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>{{ message }}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{{ sample_data }}
+{% if room_id.file_upload %}
+<h1>Filopplasting for {{ room }} i leilighet {{ apartment }}</h1>
+<form action="#" method="POST" enctype=multipart/form-data>
+    {{ file_form.hidden_tag() }}
+    {{ file_form.file.label }}
+    {{ file_form.file }}
+    {{ file_form.fileSubmit }}
+</form>
+{% if files %}
+{% for file in files %}
+      <p><a href="/static/users/{{ username }}/{{ file }}">{{ file }}</a></p>
+    {% endfor %}
+{% endif %}
+{% else %}
 <h1>Kategorier til {{ room }} i leilighet {{ apartment }}</h1>
+{% endif %}
+
     {% if categories %}
         {% for cat in categories %}
             <a href="{{url_for('user_apartments.apartment_product', apartment=apartment, room=room, category=cat)}}">{{ cat.name }}</a>
         {% endfor %}
 {% endif %}
+
 {% endblock %}
+
+

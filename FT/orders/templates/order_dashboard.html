@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content%}
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>{{ message }}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{{ sample_data }}
+<h2>Order dashboard for {{ apartment_id }}</h2>
+<div style="display: flex; justify-content: space-between; max-width: 1000px;">
+    <div>
+        <h3>Totaloversikt</h3>
+        <ul>
+        {% for data in allProducts["rooms"] %}
+            <li><h4>{{ data }}</h4></li>
+            <ul>
+            {% for category in allProducts["rooms"][data]["categories"] %}
+                <li>{{ category }}</li>
+                <ul>
+                {% for product in allProducts["rooms"][data]["categories"][category]["products"] %}
+                    <li><b>{{ allProducts["rooms"][data]["categories"][category]["products"][product]["navn"] }}</b></li>
+                    <li>NRF: {{ product }}</li>
+                    <li>Antall: {{ allProducts["rooms"][data]["categories"][category]["products"][product]["antall"] }}</li>
+                    <li>Fra ordre: 
+                        <a href="{{url_for('orders.order_dashboard_order', order_id=allProducts['rooms'][data]['categories'][category]['products'][product]['bestillingsid'], apartment_id=apartment_id)}}">
+                            {{ allProducts["rooms"][data]["categories"][category]["products"][product]["bestillingsid"] }}
+                        </a>
+                    </li>
+                    <li>Bestillingsdato: {{ allProducts["rooms"][data]["categories"][category]["products"][product]["bestillingsdato"] }}</li>
+                    <li>Totalpris: {{ allProducts["rooms"][data]["categories"][category]["products"][product]["totalpris"] }}</li>
+                    <li>Standardvare: 
+                        {% if allProducts["rooms"][data]["categories"][category]["products"][product]["standardvare"] %}
+                            ja
+                        {% else %}
+                            nei
+                        {% endif %}
+                    </li>
+                {% endfor %}
+                </ul>
+            {% endfor %}
+            </ul>
+        {% endfor %}
+        </ul>
+        <h3>Totalpris: {{ allProducts["totalPrice"] }}</h3>
+        <h3>Alle ordre</h3>
+        <ul>
+        {% for order in orders %}
+            <li>
+                <a href="{{url_for('orders.order_dashboard_order', order_id=order.id, apartment_id=apartment_id)}}">{{ order.id }}</a>
+                {% if order.standardprodukter %}
+                    (standardprodukter)
+                {% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+    <div>
+        <h3>Opplastede filer</h3>
+        {% if filestruct %}
+            {% for folder in filestruct %}
+                <h4>{{ folder }}</h4>
+                {% for file in filestruct[folder] %}
+                    {{ file }}<br/>
+                {% endfor %}
+            {% endfor %}
+        {% else %}
+            <p>Ingen filer</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

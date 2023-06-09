@@ -22,6 +22,7 @@ products_category = db.Table("products_category",
 class Category(HasSlug, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
+    file_upload = db.Column(db.Boolean)
     room_id = db.Column(db.Integer, db.ForeignKey('room.id'))
     apartment_data = db.Column(db.String, db.ForeignKey('apartmentdata.id'))
     product = db.relationship("Products", secondary=products_category, backref=db.backref('category', lazy='dynamic'))

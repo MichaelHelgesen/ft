@@ -17,6 +17,7 @@ class HasSlug:
 class Room(HasSlug, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
+    file_upload = db.Column(db.Boolean)
     apartmenttype = db.Column(db.Integer, db.ForeignKey('apartmenttype.id'))
 
     def __repr__(self):

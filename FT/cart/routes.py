@@ -36,7 +36,9 @@ def cart_list():
     deleteForm = DeleteFromCart()
 
     apartment_id = current_user.apartment_id
-
+    print("APARTMENT ID", apartment_id)
+    apartment = Apartments.query.filter_by(id = apartment_id).first()
+    print("APARTMENT", apartment)
     standardproducts = {
         "rooms": {},
         "totalPrice": 0
@@ -88,6 +90,7 @@ def cart_list():
             new_order.leilighet_id = apartment_id
             new_order.status = test
             new_order.standardprodukter = 0
+            new_order.leilighet_navn = apartment.apartment_id
             db.session.add(new_order)
             # db.session.flush
             db.session.commit()
@@ -201,7 +204,7 @@ def cart_list():
 
             server = smtplib.SMTP("smtp.gmail.com", 587)
             server.starttls()
-            server.login(me, "")
+            server.login(me, "-")
             server.sendmail(me, you, msg.as_string())
             server.quit()
 

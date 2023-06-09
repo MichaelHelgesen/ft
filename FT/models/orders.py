@@ -12,6 +12,7 @@ order_statuses = db.Table("order_statuses",
 class Orders(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     leilighet_id = db.Column(db.Integer, db.ForeignKey('apartments.id'))
+    leilighet_navn = db.Column(db.String)
     dato = db.Column(db.DateTime(timezone=True), server_default=func.now())
     status = db.relationship("Status", secondary=order_statuses, backref=db.backref('orders', lazy='dynamic'))
     standardprodukter = db.Column(db.Boolean)

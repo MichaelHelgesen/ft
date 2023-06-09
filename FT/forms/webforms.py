@@ -96,6 +96,7 @@ class RemoveApartmentTypeForm(FlaskForm):
 
 class AddRoomForm(FlaskForm):
     room_name = StringField('room_name', validators=[DataRequired()])
+    file_upload = BooleanField("file_upload")
     submit_room = SubmitField("Submit")
 
 class AddCategory(FlaskForm):
@@ -153,3 +154,7 @@ class DeleteFromCart(FlaskForm):
 class AddApartmentDataToCategory(FlaskForm):
     ApartmentData = SelectField('apartmentdata')
     submitData = SubmitField("Add data")
+
+class FileUpload(FlaskForm):
+    file = FileField("file", validators=[DataRequired()])
+    fileSubmit = SubmitField("Submit")

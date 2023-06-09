@@ -12,12 +12,7 @@
 {% if orders %}
 <h3>Ordre per leilighet</h3>
     {% for order in orders %}
-        <a href="{{url_for('orders.order_details', order_id=order.id)}}">{{order.leilighet_id}}</a><br />
-        <form action="/user_orders" method="POST">
-            {{ delete_form.hidden_tag() }}
-            <input id="order_id" name="order_id" type="text" value="{{ order.id }}" readonly>
-            {{ delete_form.submitDeleteOrder }}
-        </form>
+        <a href="{{url_for('orders.order_dashboard', apartment_id=order.leilighet_navn)}}">{{order.leilighet_navn}}</a><br />
     {% endfor %}
 {% endif %}
 {% if all_orders %}

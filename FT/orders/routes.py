@@ -14,6 +14,7 @@ import flask_excel as excel
 import pandas as pd
 import sqlite3
 import uuid
+import os
 from sqlalchemy import func
 from FT.forms.webforms import AddOrder, DeleteOrder
 from FT.models.category import products_category
@@ -141,6 +142,7 @@ def order_list():
                 new_order = Orders()
                 new_order.leilighet_id = apartment_id
                 new_order.status = test
+                new_order.leilighet_navn = apartment.apartment_id
                 new_order.standardprodukter = 1
                 db.session.add(new_order)
                 #db.session.flush
@@ -229,6 +231,7 @@ def order_list_admin():
     delete_form = DeleteOrder()
     all_orders = Orders.query.all()
     orders = Orders.query.group_by(Orders.leilighet_id).all()
+    
     print(orders)
 
     if request.method == "POST":
@@ -282,3 +285,116 @@ def download_data(id):
     #d = {'nrf': ["a"], "Produktnavn": ["d"]}
 
     return excel.make_response_from_dict(d, file_type=extension_type, file_name=filename)
+
+@orders.route('/user_orders/<string:apartment_id>', methods=["GET", "POST"])
+@login_required
+def order_dashboard(apartment_id):
+    
+    allProducts = {
+                "rooms": {},
+                "totalPrice": 0,
+            }
+
+    # Alle ordrer
+    orders = Orders.query.filter_by(leilighet_navn = apartment_id).all()
+
+    for order in orders:
+        print("ORDRE ID", order.id)
+        ordreoversikt = Ordreoversikt.query.filter_by(ordre_id = order.id).all()
+        for ordredetaljer in ordreoversikt:
+            print("ORDREOVERSIKT", ordredetaljer.id)
+            rom = Room.query.filter_by(id=ordredetaljer.rom_id)
+            for rom in rom:
+                if not rom.file_upload:
+                    print("ROM", rom)
+                    allProducts["rooms"][rom.name] = {
+                        "id":rom.id,
+                        "categories": {}
+                    }
+                categories = Category.query.filter_by(room_id=rom.id)
+                for category in categories:
+                    allProducts["rooms"][rom.name]["categories"][category.name] = {
+                        "id":category.id,
+                        "products": {}
+                    }
+                    product = Products.query.filter_by(nrf=ordredetaljer.produkt_id).first()
+                    allProducts["rooms"][rom.name]["categories"][category.name]["products"][product.nrf] = {
+                        #"nrf": product.nrf
+                        "antall": ordredetaljer.antall,
+                        "navn": product.produktnavn,
+                        "bestillingsdato": order.dato,
+                        "bestillingsid": order.id,
+                        "standardvare": order.standardprodukter,
+                        "totalpris": product.pris * ordredetaljer.antall
+                    }
+                    allProducts["totalPrice"] += product.pris * ordredetaljer.antall
+
+
+    print(allProducts)
+    
+    user_folder = os.path.join(app.config['UPLOAD_PATH'], apartment_id)
+    filenames= os.listdir(user_folder) # get all files' and folders' names in the current directory
+    filestruct = {
+    }
+    for x in filenames:
+        if os.path.isdir(os.path.join(os.path.abspath(user_folder), x)):
+            filestruct[x] = []
+            files = os.listdir(os.path.join(user_folder, x))
+            for y in files:
+                filestruct[x].append(y)
+
+
+    print(filestruct)
+    if os.path.isdir(user_folder):
+        print(user_folder)
+    return render_template("order_dashboard.html", allProducts=allProducts, filestruct=filestruct ,orders=orders, apartment_id=apartment_id)
+
+@orders.route('/user_orders/<string:apartment_id>/<int:order_id>', methods=["GET", "POST"])
+@login_required
+def order_dashboard_order(apartment_id, order_id):
+
+    order = Orders.query.filter_by(id=order_id).first()
+    
+    ordreoversikt = Ordreoversikt.query.filter_by(ordre_id = order.id).all()
+
+    standardproducts = {
+            "rooms": {},
+            "totalPrice": 0
+        }
+
+    for item in ordreoversikt:
+        room = Room.query.filter_by(id=item.rom_id).first()
+        standardproducts["rooms"][room.name] = {
+            "id": room.id,
+            "categories": {}
+        }
+    
+    for item in ordreoversikt:
+        room = Room.query.filter_by(id=item.rom_id).first()
+        categories = Category.query.filter_by(id=item.kategori_id).first()
+        if item.id:
+            standardproducts["rooms"][room.name]["categories"][categories.name] = {
+                    "id": categories.id,
+                    "products": {}
+                }
+    
+    for item in ordreoversikt:
+        room = Room.query.filter_by(id=item.rom_id).first()
+        categories = Category.query.filter_by(id=item.kategori_id).first()
+        product = Products.query.filter_by(nrf=item.produkt_id).first()
+        if item.id:
+            #standardproducts["rooms"][room.name]["categories"][categories.name]["products"].append(product)
+            standardproducts["rooms"][room.name]["categories"][categories.name]["products"][product.nrf] = {
+                #"nrf": product.nrf,
+                "antall": item.antall,
+                "navn": product.produktnavn,
+                "price": item.pris * item.antall,
+            }
+            standardproducts["totalPrice"] += item.antall * item.pris
+    
+    
+
+    
+    print(standardproducts)
+
+    return render_template("order_details.html", order=order, standardproducts=standardproducts)

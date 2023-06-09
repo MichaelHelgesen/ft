@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, url_for, request, flash
+from flask import Blueprint, render_template, url_for, request, flash, redirect
 from flask_login import login_user, login_required, current_user, logout_user
 from FT.models.apartments import Apartments, Apartmentdata
 from FT.models.room import Room
@@ -7,7 +7,8 @@ from FT.models.category import Category
 from FT.models.apartmenttype import Apartmenttype
 from FT.models.products import Products
 from FT.models.cart import Cart
-from FT import db
+from FT import db, app
+import os
 from FT.forms import webforms
 
 
@@ -41,6 +42,7 @@ def apartment_rooms(apartment):
 @user_apartments.route('/apartment/<string:apartment>/<string:room>', methods=["GET", "POST"])
 @login_required
 def apartment_category(apartment, room):
+        file_form = webforms.FileUpload()
         user_apartments = Apartments.query.filter_by(id = current_user.apartment_id).first()
         apartmenttype = db.session.query(Apartmenttype).join(Apartments.apartmenttype).filter(Apartments.id == user_apartments.id).first()
         room_id = Room.query.filter(Room.name.like(room), Room.apartmenttype.like(apartmenttype.id)).first()
@@ -48,8 +50,23 @@ def apartment_category(apartment, room):
         room_categories = Category.query.filter_by(room_id = room_id.id).all()
         #print(room_categories)
         #room_id = Room.query.filter_by(apartmenttype = )
+        #username = current_user.name.strip().capitalize()
+        user_folder = os.path.join(app.config['UPLOAD_PATH'], user_apartments.apartment_id, room)
+        files = None
         
-        return render_template("categories.html", apartment=apartment, room=room, categories=room_categories)
+        if request.method == "POST":
+                if not os.path.isdir(user_folder):
+                        os.mkdir(user_folder)
+                files = os.listdir(os.path.join(app.config['UPLOAD_PATH'], user_apartments.apartment_id, room))
+                if file_form.fileSubmit.data:
+                        uploaded_file = request.files['file']
+                        if uploaded_file.filename != '':
+                                #uploaded_file.save(uploaded_file.filename)
+                                uploaded_file.save(os.path.join(app.config['UPLOAD_PATH'], user_apartments.apartment_id, room, uploaded_file.filename))
+                flash("uploaded")
+                return redirect(request.url)
+
+        return render_template("categories.html", user_folder=user_folder, username=user_apartments.apartment_id, files=files, file_form=file_form, room_id=room_id, apartment=apartment, room=room, categories=room_categories)
 
 @user_apartments.route('/apartment/<string:apartment>/<string:room>/<string:category>', methods=["GET", "POST"])
 @login_required
@@ -104,3 +121,5 @@ def apartment_products(apartment, room, category, product):
                 flash("added to cart")
 
         return render_template("single_product.html", apartment_data_value=apartment_data_value, product=product, form=form, image_file=image_file, apartment=apartment, room=room, category=category)
+
+
