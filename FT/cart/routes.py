@@ -204,7 +204,7 @@ def cart_list():
 
             server = smtplib.SMTP("smtp.gmail.com", 587)
             server.starttls()
-            server.login(me, "-")
+            server.login(me, "")
             server.sendmail(me, you, msg.as_string())
             server.quit()
 

@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import widgets
-from wtforms import StringField, PasswordField, SubmitField, FileField, SelectMultipleField, BooleanField, SelectField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, HiddenField, FileField, SelectMultipleField, BooleanField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, EqualTo
 
 class UserForm(FlaskForm):

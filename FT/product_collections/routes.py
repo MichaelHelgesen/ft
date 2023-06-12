@@ -249,6 +249,20 @@ def room_category(apartmenttype, room, slug):
     #form.collection_name.data = collection.name
     
     if request.method == "POST":
+        
+        if request.is_json:
+            data = request.get_json()
+            if data["add"]:
+                print("Request is JSON")
+                print(data["id"])
+                category.product.append(Products.query.filter_by(nrf=data["id"]).first())
+                db.session.commit()
+            elif not data["add"]:
+                category.product.remove(Products.query.filter_by(nrf=data["id"]).first())
+                db.session.commit()
+        else:
+            print("Request is not JSON")
+            
         if projectform.submit.data:
             #apartmenttype_id.name = request.form["apartmenttype_name"].upper()
             #apartmenttype_id.slug = str_to_slug(request.form["apartmenttype_name"])
@@ -276,6 +290,7 @@ def room_category(apartmenttype, room, slug):
 
         if removeForm.submit3.data and removeForm.validate():
             flash("Removed from collection!")
+            print("FRA SKJEMA", request.form["product_id"])
             #print(request.form["product_id"])
             #print(Products.query.filter_by(nrf=request.form["product_id"]).first())
             #collection.product = Products.query.filter_by(nrf=request.form["product_id"]).first()
@@ -330,3 +345,38 @@ def delete_col(name):
     except:
         flash("There was a problem")
         return redirect(url_for("product_col.collections"))
+
+@product_col.route("/process/<string:apartmenttype>/<string:room>/<string:slug>/<int:id>", methods=["GET"])
+@login_required
+def process(apartmenttype, room, slug, id):
+    print("JAVASCRIPT", id)
+    return redirect(url_for("product_col.room_category"))
+#room_category(apartmenttype, room, slug)
+
+@product_col.route("/process-list/<string:apartmenttype>/<string:room>/<string:slug>/<string:id>/add", methods=["GET"])
+@login_required
+def process_list(apartmenttype, room, slug, id):
+    apartmenttype_id = Apartmenttype.query.filter_by(slug=apartmenttype).first()
+    room_id = Room.query.filter(Room.slug.like(room), Room.apartmenttype.like(apartmenttype_id.id)).first()
+    category = Category.query.filter(Category.room_id.like(room_id.id), Category.slug.like(slug)).first()
+    chosenProducts = db.session.query(Products).join(Category.product).filter(Category.id == category.id).distinct()
+    return render_template("process_list_remove.html", chosenProducts=chosenProducts, apartmenttype=apartmenttype, room=room, slug=slug)
+
+@product_col.route("/process-list/<string:apartmenttype>/<string:room>/<string:slug>/<string:id>/remove", methods=["GET"])
+@login_required
+def process_list_remove(apartmenttype, room, slug, id):
+    products = Products.query.all()
+    apartmenttype_id = Apartmenttype.query.filter_by(slug=apartmenttype).first()
+    room_id = Room.query.filter(Room.slug.like(room), Room.apartmenttype.like(apartmenttype_id.id)).first()
+    category = Category.query.filter(Category.room_id.like(room_id.id), Category.slug.like(slug)).first()
+    #projects = Project.query.all()
+    filtered = []
+    
+    chosenProducts = db.session.query(Products).join(Category.product).filter(Category.id == category.id).distinct()
+    #productsAvaliable = db.session.query(Products).outerjoin(products_category, Products.nrf == products_category.columns.products_id).filter(products_category.columns.products_id == None).all()
+
+    for x in products:
+        if x not in chosenProducts:
+            filtered.append(x)
+
+    return render_template("process_list_add.html", productsAvaliable=filtered, apartmenttype=apartmenttype, room=room, slug=slug)

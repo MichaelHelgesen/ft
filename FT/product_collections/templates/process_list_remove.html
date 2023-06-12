@@ -1,0 +1,9 @@
+{% for product in chosenProducts %}
+                <li style="list-style-type:none; background: #ccc; padding: 5px; margin-bottom: 5px;" onclick="remove_entry('{{ product.nrf }}', window.origin, '{{ apartmenttype }}', '{{ room }}', '{{ slug }}')">
+                    <div style="display: flex;">
+                        <div>
+                            <span class="nrf">{{ product.nrf}}</span> - {{ product.produktnavn }} - {{ product.farge }}
+                        </div>
+                    </div>
+                </li>
+{% endfor %}
