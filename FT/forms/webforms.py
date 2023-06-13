@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import widgets
-from wtforms import StringField, PasswordField, SubmitField, HiddenField, FileField, SelectMultipleField, BooleanField, SelectField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, HiddenField, FileField, SelectMultipleField, BooleanField, SelectField, TextAreaField, RadioField
 from wtforms.validators import DataRequired, EqualTo
 
 class UserForm(FlaskForm):
@@ -158,3 +158,7 @@ class AddApartmentDataToCategory(FlaskForm):
 class FileUpload(FlaskForm):
     file = FileField("file", validators=[DataRequired()])
     fileSubmit = SubmitField("Submit")
+
+class ChangeStatus(FlaskForm):
+    status = RadioField('Status', choices=[])
+    statusSubmit = SubmitField("Submit")

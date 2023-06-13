@@ -81,44 +81,56 @@ def cart_list():
     # Ordrestatus
     test = Status.query.filter_by(id=1).all()
 
+    # Finnes standardordre?
+    standardorder = Orders.query.filter_by(leilighet_navn = apartment.apartment_id, standardprodukter = 1).first()
+    standard_details = Ordreoversikt.query.filter_by(ordre_id = standardorder.id).first()
+    print("STANDARDORDER", standardorder)
+    print("STANDARDORDER DETAILS", standard_details)
+
     if request.method == "POST":
+
 
         if form.submitOrder.data and form.validate():
 
             # Ny ordre
-            new_order = Orders()
-            new_order.leilighet_id = apartment_id
-            new_order.status = test
-            new_order.standardprodukter = 0
-            new_order.leilighet_navn = apartment.apartment_id
-            db.session.add(new_order)
+            #new_order = Orders()
+            #new_order.leilighet_id = apartment_id
+            #new_order.status = test
+            #new_order.standardprodukter = 0
+            #new_order.leilighet_navn = apartment.apartment_id
+            #db.session.add(new_order)
             # db.session.flush
-            db.session.commit()
-            db.session.refresh(new_order)
+            #db.session.commit()
+            #db.session.refresh(new_order)
 
             for room in standardproducts["rooms"]:
                 print(room)
                 room_id = (standardproducts["rooms"][room]["id"])
                 for category in standardproducts["rooms"][room]["categories"]:
                     print(category)
+                    if (standardorder):
+                        if standardproducts["rooms"][room]["categories"][category]["id"] == standard_details.kategori_id:
+                            print("TJOOOHOHO")
                     category_id = standardproducts["rooms"][room]["categories"][category]["id"]
+                    print("cat id", category_id)
+                    print("cat_det", standard_details.kategori_id)
                     for product in standardproducts["rooms"][room]["categories"][category]["products"]:
                         print(product["product"])
 
                         # Ordredetaljer
-                        new_order_details = Ordreoversikt()
-                        new_order_details.ordre_id = new_order.id
-                        new_order_details.pris = product["price"]
-                        new_order_details.produkt_id = product["product"].nrf
-                        new_order_details.antall = product["num"]
-                        new_order_details.rom_id = room_id
-                        new_order_details.kategori_id = category_id
-                        db.session.add(new_order_details)
-                        db.session.commit()
+                        #new_order_details = Ordreoversikt()
+                        #new_order_details.ordre_id = new_order.id
+                        #new_order_details.pris = product["price"]
+                        #new_order_details.produkt_id = product["product"].nrf
+                        #new_order_details.antall = product["num"]
+                        #new_order_details.rom_id = room_id
+                        #new_order_details.kategori_id = category_id
+                        #db.session.add(new_order_details)
+                        #db.session.commit()
 
-            delete_q = Cart.__table__.delete().where(Cart.leilighet_id == apartment_id)
-            db.session.execute(delete_q)
-            db.session.commit()
+            #delete_q = Cart.__table__.delete().where(Cart.leilighet_id == apartment_id)
+            #db.session.execute(delete_q)
+            #db.session.commit()
 
             def getHTML(dict):
                 html = ""
@@ -202,13 +214,13 @@ def cart_list():
 
                 message += tabulate(table, tablefmt='html') """
 
-            server = smtplib.SMTP("smtp.gmail.com", 587)
-            server.starttls()
-            server.login(me, "")
-            server.sendmail(me, you, msg.as_string())
-            server.quit()
+            #server = smtplib.SMTP("smtp.gmail.com", 587)
+            #server.starttls()
+            #server.login(me, "")
+            #server.sendmail(me, you, msg.as_string())
+            #server.quit()
 
-            flash("order added")
+            #flash("order added")
             return redirect(url_for("cart.cart_list"))
 
         if deleteForm.deleteFromCart.data and form.validate():

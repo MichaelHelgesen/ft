@@ -20,7 +20,7 @@ class Orders(db.Model):
     def __repr__(self):
         return '<Orders %r>' % self.id
     
-    def __str__(self):
+    def __int__(self):
         return self.id
     
     def __unicode__(self):
@@ -46,7 +46,7 @@ class Ordreoversikt(db.Model):
     rom_id = db.Column(db.Integer, db.ForeignKey('room.id'))
     kategori_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     
-    def __str__(self):
+    def __int__(self):
         return self.id
     
     def __unicode__(self):

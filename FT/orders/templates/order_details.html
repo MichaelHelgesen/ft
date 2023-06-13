@@ -9,7 +9,8 @@
 {% endfor %}
 {{ sample_data }}
 <h2>Order {{order.id}}</h2>
-<small>Bestilt: {{ order.dato }}</small>
+<small>Bestilt: {{ order.dato }}</small><br/>
+<small>Status: {{ order.status[0] }}</small>
 <ul>
     {% for key in standardproducts.rooms %}
         <li>{{ key }}</li>
@@ -34,5 +35,19 @@
         {% endfor %}
     {% endfor %}
 </ul>
+{% if order.standardprodukter %}
+<h3>Totalpris: 0</h3>
+{% else %}
 <h3>Totalpris: {{ standardproducts.totalPrice }}</h3>
+{% endif %}
+{% for x in current_user.role %}
+    {% if x.name == "admin": %}
+<form action="#" method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.status.label }}
+    {{ form.status }}
+    {{ form.statusSubmit }}
+</form>
+{% endif %}
+{% endfor %}
 {% endblock %}

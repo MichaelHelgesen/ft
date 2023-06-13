@@ -6,7 +6,7 @@ from FT.models.collections import Collections, products_collections
 from FT.models.category import Category
 from FT.models.apartmenttype import Apartmenttype
 from FT.models.products import Products
-from FT.models.orders import Orders
+from FT.models.orders import Orders, Status
 from FT.models.projects import Project
 from FT.models.orders import Orders, order_statuses, Ordreoversikt, Status
 from FT import db, app
@@ -16,7 +16,7 @@ import sqlite3
 import uuid
 import os
 from sqlalchemy import func
-from FT.forms.webforms import AddOrder, DeleteOrder
+from FT.forms.webforms import AddOrder, DeleteOrder, ChangeStatus
 from FT.models.category import products_category
 
 
@@ -31,7 +31,8 @@ def order_list():
 
     standardproducts = {
         "rooms": {},
-        "totalPrice": 0
+        "totalPrice": 0,
+        "status": "d"
     }
 
     #Skjema
@@ -131,24 +132,28 @@ def order_list():
                     })
     
     # Ordrestatus
-    test = Status.query.filter_by(id = 1).all()
-
-    print("STANDARDPRODUKTER", standardproducts)
+    test = Status.query.filter_by(id = 2).first()
+    print("TEST", test.name)
+    
+    
 
     if not standard_apartment_order and not apartment_order:
+        standardproducts["status"] = test.name
         for x in current_user.role:
             if x.name == "user":
                 # Ny ordre
                 new_order = Orders()
                 new_order.leilighet_id = apartment_id
-                new_order.status = test
+                new_order.status = [test]
                 new_order.leilighet_navn = apartment.apartment_id
                 new_order.standardprodukter = 1
                 db.session.add(new_order)
                 #db.session.flush
                 db.session.commit()
                 db.session.refresh(new_order)
-
+                
+                print("STANDARDPRODUKTER", standardproducts)    
+                
                 for room in standardproducts["rooms"]:
                     print(room)
                     room_id = (standardproducts["rooms"][room]["id"])
@@ -183,9 +188,12 @@ def order_details(order_id):
     
     ordreoversikt = Ordreoversikt.query.filter_by(ordre_id = order.id).all()
 
+    ordrestatus = Status.query.join(order_statuses).filter(order_statuses.columns.orders_id == order.id).first()
+
     standardproducts = {
             "rooms": {},
-            "totalPrice": 0
+            "totalPrice": 0,
+            "status": ordrestatus.name
         }
 
     for item in ordreoversikt:
@@ -292,6 +300,7 @@ def order_dashboard(apartment_id):
     
     allProducts = {
                 "rooms": {},
+                "status": "",
                 "totalPrice": 0,
             }
 
@@ -300,6 +309,8 @@ def order_dashboard(apartment_id):
 
     for order in orders:
         print("ORDRE ID", order.id)
+        ordrestatus = Status.query.join(order_statuses).filter(order_statuses.columns.orders_id == order.id).first()
+        print("ORDRESTATUS", ordrestatus)
         ordreoversikt = Ordreoversikt.query.filter_by(ordre_id = order.id).all()
         for ordredetaljer in ordreoversikt:
             print("ORDREOVERSIKT", ordredetaljer.id)
@@ -325,7 +336,8 @@ def order_dashboard(apartment_id):
                         "bestillingsdato": order.dato,
                         "bestillingsid": order.id,
                         "standardvare": order.standardprodukter,
-                        "totalpris": product.pris * ordredetaljer.antall
+                        "totalpris": product.pris * ordredetaljer.antall,
+                        "status": ordrestatus.name
                     }
                     allProducts["totalPrice"] += product.pris * ordredetaljer.antall
 
@@ -352,9 +364,16 @@ def order_dashboard(apartment_id):
 @orders.route('/user_orders/<string:apartment_id>/<int:order_id>', methods=["GET", "POST"])
 @login_required
 def order_dashboard_order(apartment_id, order_id):
-
+    form = ChangeStatus()
     order = Orders.query.filter_by(id=order_id).first()
     
+    statuses = Status.query.all()
+    print(order.status[0].id)
+    for status in statuses:
+        form.status.choices.insert(status.id,(status.name, status.name))
+        form.status.default = order.status[0].name
+        form.status.process([])
+
     ordreoversikt = Ordreoversikt.query.filter_by(ordre_id = order.id).all()
 
     standardproducts = {
@@ -392,9 +411,14 @@ def order_dashboard_order(apartment_id, order_id):
             }
             standardproducts["totalPrice"] += item.antall * item.pris
     
-    
+    if request.method == "POST":
+        flash("Status oppdatert")
+        status_check = Status.query.filter_by(name=request.form["status"]).all()
+        order.status = status_check
+        db.session.commit()
+        return redirect(request.url)
 
     
     print(standardproducts)
 
-    return render_template("order_details.html", order=order, standardproducts=standardproducts)
+    return render_template("order_details.html", form=form, order=order, standardproducts=standardproducts)

@@ -37,6 +37,7 @@
                             nei
                         {% endif %}
                     </li>
+                    <li>Status: {{ allProducts["rooms"][data]["categories"][category]["products"][product]["status"] }}</li>
                 {% endfor %}
                 </ul>
             {% endfor %}
@@ -52,6 +53,7 @@
                 {% if order.standardprodukter %}
                     (standardprodukter)
                 {% endif %}
+                status: {{ order.status[0] }}
             </li>
         {% endfor %}
         </ul>

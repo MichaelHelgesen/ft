@@ -18,7 +18,7 @@
 {% if all_orders %}
 <h3>Alle ordre</h3>
     {% for order in all_orders %}
-        <a href="{{url_for('orders.order_details', order_id=order.id)}}">Ordre-ID: {{ order.id }} - dato: {{ order.dato }}</a><br />
+        <a href="{{url_for('orders.order_dashboard_order', order_id=order.id, apartment_id=order.leilighet_navn)}}">Ordre-ID: {{ order.id }} - dato: {{ order.dato }} - status: {{ order.status[0].name }}</a><br />
         <form action="/user_orders" method="POST">
             {{ delete_form.hidden_tag() }}
             <input id="order_id" name="order_id" type="text" value="{{ order.id }}" readonly>

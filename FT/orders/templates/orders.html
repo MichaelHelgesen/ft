@@ -21,7 +21,7 @@
 <h3>Standardvarer</h3>
 <p>Produktene i denne ordren vil automatisk slettes om du velger et tilvalg i samme kategori.</p>
     {% for order in standard_apartment_order %}
-        <a href="{{url_for('orders.order_details', order_id=order.id)}}">Ordre-ID: {{ order.id }} - dato: {{ order.dato }}</a><br />
+        <a href="{{url_for('orders.order_details', order_id=order.id)}}">Ordre-ID: {{ order.id }} - dato: {{ order.dato }} - status: {{ order.status[0] }}</a><br />
     {% endfor %}
 {% endif %}
 {% endblock %}

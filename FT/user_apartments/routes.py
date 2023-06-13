@@ -79,6 +79,8 @@ def apartment_product(apartment, room, category):
         products = Products.query.join(Category.product).filter(Category.id == category_id.id).all()
         #print(category_id2)
         #print(room_id)
+        print(products)
+        print(category_id.id)
         return render_template("category_product.html", category=category, room=room, apartment=apartment, products=products)
 
 @user_apartments.route('/apartment/<string:apartment>/<string:room>/<string:category>/<string:product>', methods=["GET", "POST"])
