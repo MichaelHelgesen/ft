@@ -4,7 +4,7 @@ from FT import db, app
 import flask_excel as excel
 import pandas as pd
 from functools import wraps
-from FT.models.add_user import Users, Role
+from FT.models.add_user import Users, Role, apartments_users
 from FT.models.apartments import Apartments
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, current_user, logout_user
@@ -140,7 +140,8 @@ def admin_user_update(id):
     form = webforms.UpdateUserForm()
     roles = Role.query.all()
     apartments = Apartments.query.all()
-    user_selected_apartments = db.session.query(Apartments.join())
+    user_selected_apartments = db.session.query(Apartments, apartments_users).all()
+    print(user_selected_apartments)
     current_apartment = Apartments.query.filter_by(id = user.apartment_id).first()
     form.apartment.choices = [(apartments.id, apartments.apartment_id.title()) for apartments in apartments]
     if current_apartment:
