@@ -8,6 +8,10 @@ roles_users = db.Table("roles_users",
     db.Column("role_id", db.Integer, db.ForeignKey("role.id"))
 )
 
+apartments_users = db.Table("apartments_users",
+    db.Column("user_id", db.Integer, db.ForeignKey("users.id")),
+    db.Column("apartment_id", db.Integer, db.ForeignKey("apartments.id"))
+)
 
 # Create database model
 class Users(UserMixin, db.Model):
@@ -18,6 +22,7 @@ class Users(UserMixin, db.Model):
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     password_hash = db.Column(db.String(128))
     role = db.relationship("Role", secondary=roles_users,backref=db.backref('user', lazy='dynamic'))
+    apartments_list = db.relationship("Apartments", secondary=apartments_users,backref=db.backref('user', lazy='dynamic'))
     apartment_id = db.Column(db.Integer, db.ForeignKey('apartments.id'))
 
     def __repr__(self):
@@ -33,8 +38,6 @@ class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40))
     description = db.Column(db.String(255))
-    
-    
 
     def __str__(self):
         return self.name

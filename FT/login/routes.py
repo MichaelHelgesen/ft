@@ -140,9 +140,9 @@ def admin_user_update(id):
     form = webforms.UpdateUserForm()
     roles = Role.query.all()
     apartments = Apartments.query.all()
+    user_selected_apartments = db.session.query(Apartments.join())
     current_apartment = Apartments.query.filter_by(id = user.apartment_id).first()
     form.apartment.choices = [(apartments.id, apartments.apartment_id.title()) for apartments in apartments]
-    
     if current_apartment:
         form.apartment.default = current_apartment.id
         form.apartment.process([])
@@ -151,11 +151,21 @@ def admin_user_update(id):
     #form.role.choices = [(roles.id, roles.name) for roles in roles]
     if request.method == "POST":
         password = request.form["password_hash"]
+        
         user_roles = request.form.getlist('hello')
         user.role = []
         for x in user_roles:
             if Role.query.filter_by(id = x).first():
                 user.role.append(Role.query.filter_by(id = x).first())
+
+        user_apartments = request.form.getlist('apartments')
+        user.apartments_list = []
+        for x in user_apartments:
+            if Apartments.query.filter_by(id = x).first():
+                user.apartments_list.append(Apartments.query.filter_by(id = x).first())
+
+        print(user_apartments)
+        print(user.apartments_list)
 
         if password:
             hashed_pw = generate_password_hash(password, "sha256")
@@ -172,7 +182,7 @@ def admin_user_update(id):
             flash("Error")
             return render_template("update_user.html", form=form, user=user)
     else:
-        return render_template("update_user.html", form=form, user=user, roles=roles)
+        return render_template("update_user.html", form=form, user=user, roles=roles, apartments=apartments)
 
 @login.route('/download', methods=['GET'])
 def download_data():

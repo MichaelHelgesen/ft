@@ -33,8 +33,20 @@
     {{ form.apartment.label }}
     {{ form.apartment }}
     <br />
+    <br />
     {{ form.password_hash.label }}
     {{ form.password_hash }}
+    <br />
+    <br />
+    {% for apartment in apartments %}
+    <div class="form-check">
+        <input class="form-check-input" name="apartments" type="checkbox" value="{{ apartment.id }}" id="{{ apartment.apartment_id }}" {% if role in user.role %}checked{% endif %}>
+        <label class="form-check-label" for="{{apartment.apartment_id}}">
+          {{ apartment.apartment_id }}
+        </label>
+      </div>
+    {% endfor %}
+    <br />
     <br />
     {{ form.submit }}
 </form>

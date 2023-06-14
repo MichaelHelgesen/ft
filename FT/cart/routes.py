@@ -51,6 +51,7 @@ def cart_list():
         room = Room.query.filter_by(id=item.rom).first()
         standardproducts["rooms"][room.name] = {
             "id": room.id,
+            "slug": room.slug,
             "categories": {},
         }
 
@@ -60,6 +61,7 @@ def cart_list():
         if item.id:
             standardproducts["rooms"][room.name]["categories"][categories.name] = {
                 "id": categories.id,
+                "slug": categories.slug,
                 "products": []
             }
 
@@ -83,7 +85,7 @@ def cart_list():
 
     # Finnes standardordre?
     standardorder = Orders.query.filter_by(leilighet_navn = apartment.apartment_id, standardprodukter = 1).first()
-    standard_details = Ordreoversikt.query.filter_by(ordre_id = standardorder.id).first()
+    standard_details = Ordreoversikt.query.filter_by(ordre_id = standardorder.id).all()
     print("STANDARDORDER", standardorder)
     print("STANDARDORDER DETAILS", standard_details)
 
@@ -93,44 +95,49 @@ def cart_list():
         if form.submitOrder.data and form.validate():
 
             # Ny ordre
-            #new_order = Orders()
-            #new_order.leilighet_id = apartment_id
-            #new_order.status = test
-            #new_order.standardprodukter = 0
-            #new_order.leilighet_navn = apartment.apartment_id
-            #db.session.add(new_order)
-            # db.session.flush
-            #db.session.commit()
-            #db.session.refresh(new_order)
+            new_order = Orders()
+            new_order.leilighet_id = apartment_id
+            new_order.status = test
+            new_order.standardprodukter = 0
+            new_order.leilighet_navn = apartment.apartment_id
+            db.session.add(new_order)
+            db.session.flush
+            db.session.commit()
+            db.session.refresh(new_order)
 
             for room in standardproducts["rooms"]:
-                print(room)
+                print("romid", standardproducts["rooms"][room]["id"])
                 room_id = (standardproducts["rooms"][room]["id"])
                 for category in standardproducts["rooms"][room]["categories"]:
                     print(category)
+                    print("slug", standardproducts["rooms"][room]["categories"][category]["slug"])
                     if (standardorder):
-                        if standardproducts["rooms"][room]["categories"][category]["id"] == standard_details.kategori_id:
-                            print("TJOOOHOHO")
+                        for x in standard_details:
+                            r = Room.query.filter_by(id=x.rom_id).first()
+                            c = Category.query.filter_by(id=x.kategori_id).first()
+                            if r.slug == standardproducts["rooms"][room]["slug"] and c.slug == standardproducts["rooms"][room]["categories"][category]["slug"]:
+                                delete_q = Ordreoversikt.__table__.delete().where(
+                                Ordreoversikt.rom_id == x.rom_id, Ordreoversikt.kategori_id == x.kategori_id)
+                                db.session.execute(delete_q)
+                                db.session.commit()
                     category_id = standardproducts["rooms"][room]["categories"][category]["id"]
-                    print("cat id", category_id)
-                    print("cat_det", standard_details.kategori_id)
                     for product in standardproducts["rooms"][room]["categories"][category]["products"]:
                         print(product["product"])
 
                         # Ordredetaljer
-                        #new_order_details = Ordreoversikt()
-                        #new_order_details.ordre_id = new_order.id
-                        #new_order_details.pris = product["price"]
-                        #new_order_details.produkt_id = product["product"].nrf
-                        #new_order_details.antall = product["num"]
-                        #new_order_details.rom_id = room_id
-                        #new_order_details.kategori_id = category_id
-                        #db.session.add(new_order_details)
-                        #db.session.commit()
+                        new_order_details = Ordreoversikt()
+                        new_order_details.ordre_id = new_order.id
+                        new_order_details.pris = product["price"]
+                        new_order_details.produkt_id = product["product"].nrf
+                        new_order_details.antall = product["num"]
+                        new_order_details.rom_id = room_id
+                        new_order_details.kategori_id = category_id
+                        db.session.add(new_order_details)
+                        db.session.commit()
 
-            #delete_q = Cart.__table__.delete().where(Cart.leilighet_id == apartment_id)
-            #db.session.execute(delete_q)
-            #db.session.commit()
+            delete_q = Cart.__table__.delete().where(Cart.leilighet_id == apartment_id)
+            db.session.execute(delete_q)
+            db.session.commit()
 
             def getHTML(dict):
                 html = ""
@@ -220,7 +227,7 @@ def cart_list():
             #server.sendmail(me, you, msg.as_string())
             #server.quit()
 
-            #flash("order added")
+            flash("order added")
             return redirect(url_for("cart.cart_list"))
 
         if deleteForm.deleteFromCart.data and form.validate():

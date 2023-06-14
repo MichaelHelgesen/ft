@@ -21,6 +21,7 @@ class UpdateUserForm(FlaskForm):
     email = StringField('email', validators=[DataRequired()])
     password_hash = PasswordField("Password", validators=[DataRequired()])
     role = SelectMultipleField("roles")
+    apartments = SelectMultipleField("apartments")
     apartment = SelectField('apartment')
     submit = SubmitField("Submit")
 
