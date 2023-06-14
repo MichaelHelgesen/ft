@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, request
 from FT.forms import webforms
-from FT import db, app
+from FT import db, app 
 import flask_excel as excel
 import pandas as pd
 from functools import wraps
@@ -140,8 +140,9 @@ def admin_user_update(id):
     form = webforms.UpdateUserForm()
     roles = Role.query.all()
     apartments = Apartments.query.all()
-    user_selected_apartments = db.session.query(Apartments, apartments_users).all()
-    print(user_selected_apartments)
+    # join lar oss filtrere med en annen tabell, uten å ta den med.
+    user_selected_apartments = db.session.query(Apartments).join(apartments_users).filter(Apartments.id == apartments_users.columns.apartment_id).all()
+    print("USER SELECTED", user_selected_apartments)
     current_apartment = Apartments.query.filter_by(id = user.apartment_id).first()
     form.apartment.choices = [(apartments.id, apartments.apartment_id.title()) for apartments in apartments]
     if current_apartment:
@@ -150,6 +151,7 @@ def admin_user_update(id):
     else:
         form.apartment.choices.insert(0,("", "Velg leilighet"))
     #form.role.choices = [(roles.id, roles.name) for roles in roles]
+    
     if request.method == "POST":
         password = request.form["password_hash"]
         
@@ -183,7 +185,7 @@ def admin_user_update(id):
             flash("Error")
             return render_template("update_user.html", form=form, user=user)
     else:
-        return render_template("update_user.html", form=form, user=user, roles=roles, apartments=apartments)
+        return render_template("update_user.html", user_selected_apartments=user_selected_apartments, form=form, user=user, roles=roles, apartments=apartments)
 
 @login.route('/download', methods=['GET'])
 def download_data():

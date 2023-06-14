@@ -9,6 +9,7 @@
 {% endfor %}
 {{ sample_data }}
 <h2>Edit user: {{ user.name }}</h2>
+<h2>{{ key }}</h2>
 <form action="/users/{{ user.id }}" method="POST">
     {{ form.hidden_tag() }}
     {{ form.name.label }}
@@ -40,7 +41,7 @@
     <br />
     {% for apartment in apartments %}
     <div class="form-check">
-        <input class="form-check-input" name="apartments" type="checkbox" value="{{ apartment.id }}" id="{{ apartment.apartment_id }}" {% if role in user.role %}checked{% endif %}>
+        <input class="form-check-input" name="apartments" type="checkbox" value="{{ apartment.id }}" id="{{ apartment.apartment_id }}" {% if apartment in user_selected_apartments %}checked{% endif %}>
         <label class="form-check-label" for="{{apartment.apartment_id}}">
           {{ apartment.apartment_id }}
         </label>

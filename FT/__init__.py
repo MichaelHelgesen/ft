@@ -10,6 +10,10 @@ db = SQLAlchemy()
 
 #Create a Flask Instance
 app = Flask(__name__)
+app.context_processor
+def context_processor():
+    return dict(key="value")
+
 excel.init_excel(app)
 # configure the SQLite database, relative to the app instance folder
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///ft.db"
