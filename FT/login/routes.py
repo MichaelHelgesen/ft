@@ -140,9 +140,13 @@ def admin_user_update(id):
     form = webforms.UpdateUserForm()
     roles = Role.query.all()
     apartments = Apartments.query.all()
-    # join lar oss filtrere med en annen tabell, uten å ta den med.
+    
+    # join lar oss filtrere mot en annen tabell, uten å ta den med.
+    # Sjekk om bruker har leiligheter
     user_selected_apartments = db.session.query(Apartments).join(apartments_users).filter(Apartments.id == apartments_users.columns.apartment_id).all()
     print("USER SELECTED", user_selected_apartments)
+    
+    # Gjeldende leilighet
     current_apartment = Apartments.query.filter_by(id = user.apartment_id).first()
     form.apartment.choices = [(apartments.id, apartments.apartment_id.title()) for apartments in apartments]
     if current_apartment:

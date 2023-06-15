@@ -6,6 +6,7 @@ from FT.models.collections import Collections, products_collections
 from FT.models.category import Category
 from FT.models.apartmenttype import Apartmenttype
 from FT.models.products import Products
+from FT.models.add_user import apartments_users
 from FT.models.cart import Cart
 from FT import db, app
 import os
@@ -29,6 +30,10 @@ def apartment_rooms(apartment):
         user_apartments = Apartments.query.filter_by(id = current_user.apartment_id).first()
         apartment_data = Apartmentdata.query.filter_by(apartment_id = user_apartments.id).all()
         apartmenttype = db.session.query(Apartmenttype).join(Apartments.apartmenttype).filter(Apartments.id == user_apartments.id).first()
+        
+        
+        
+        
         #print(apartmenttype.name)
         #room_id = Room.query.filter(Room.slug.like(room), Room.apartmenttype.like(apartmenttype_id.id)).first()
         #user_apartmenttype = Apartments.query.filter_by(apartmenttype = user_apartments.apartmenttype).first()
