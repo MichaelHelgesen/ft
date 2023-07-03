@@ -163,3 +163,7 @@ class FileUpload(FlaskForm):
 class ChangeStatus(FlaskForm):
     status = RadioField('Status', choices=[])
     statusSubmit = SubmitField("Submit")
+
+class SelectApartment(FlaskForm):
+    apartments = SelectMultipleField("apartments")
+    submit = SubmitField("Velg")

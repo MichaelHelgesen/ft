@@ -12,6 +12,7 @@
 <div style="display: flex; justify-content: space-between; max-width: 1000px;">
     <div>
         <h3>Totaloversikt</h3>
+        <p><a href="{{ url_for('orders.download_data', id=apartment_id) }}">Eksporter</a></p>
         <ul>
         {% for data in allProducts["rooms"] %}
             <li><h4>{{ data }}</h4></li>

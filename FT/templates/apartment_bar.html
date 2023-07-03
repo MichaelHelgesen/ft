@@ -1,0 +1,21 @@
+{% block content%}
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>{{ message }}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{{ sample_data }}
+Du jobber med leilighet:
+{% for apartment in current_user.apartments_list %}
+    {% if apartment.id == current_user.apartment_id %}
+        {{ apartment.apartment_id }}
+    {% endif %}
+{% endfor %}
+Bytt leilighet: 
+<div class="bar"></div>
+<script src="{{url_for('static', filename='js/modal-bar.js')}}"></script>
+
+{% endblock %}
+
+

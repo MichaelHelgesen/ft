@@ -25,6 +25,9 @@
                         <a class="nav-link active" aria-current="page" href="{{ url_for('user_apartments.apartment_list')}}">Your apartments</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{url_for('user_apartments.apartment_rooms', apartment=current_user.apartment_id)}}">Shop</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="{{ url_for('orders.order_list')}}">Your orders</a>
                     </li>
                     <li class="nav-item">

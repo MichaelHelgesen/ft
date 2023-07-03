@@ -11,6 +11,7 @@
 <h2>Order {{order.id}}</h2>
 <small>Bestilt: {{ order.dato }}</small><br/>
 <small>Status: {{ order.status[0] }}</small>
+<p><a href="{{ url_for('orders.download_order', id=order.id) }}">Eksporter</a></p>
 <ul>
     {% for key in standardproducts.rooms %}
         <li>{{ key }}</li>

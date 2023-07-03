@@ -12,12 +12,43 @@
 
 <body>
     {% include "navbar.html" %}
+    {% for x in current_user.role %}
+        {% if x.name == "user" %}
+            {% include "apartment_bar.html" %}
+        {% endif %}
+    {% endfor %}
     {% block content %}
-    {% endblock%}
+    {% endblock %}
+    <!-- Modal -->
+    {% for x in current_user.role %}
+        {% if x.name == "user" %}
+        {% if not current_user.apartment_id %}
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">Velg leilighet</h1>
+                        </div>
+                        <div class="modal-body">
+                            Velg leiligheten du ønsker å bestille tilvalg til. Du kan bytte mellom leilighetene dine når som
+                            helst i feltet under menyen.
+                            <div class="modal-inject">
+                            </div>
+                            {% block modal %}
+                            {% endblock %}
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            <script src="{{url_for('static', filename='js/modal.js')}}"></script>
+            <script src="{{url_for('static', filename='js/test.js')}}"></script>
+        {% endif %}
+        {% endif %}
+    {% endfor %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
-        crossorigin="anonymous">
-    </script>
+        integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous">
+        </script>
 </body>
 
 </html>

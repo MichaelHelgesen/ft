@@ -14,6 +14,8 @@ app.context_processor
 def context_processor():
     return dict(key="value")
 
+index_add_counter = 5
+
 excel.init_excel(app)
 # configure the SQLite database, relative to the app instance folder
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///ft.db"

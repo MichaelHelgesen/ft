@@ -85,7 +85,9 @@ def cart_list():
 
     # Finnes standardordre?
     standardorder = Orders.query.filter_by(leilighet_navn = apartment.apartment_id, standardprodukter = 1).first()
-    standard_details = Ordreoversikt.query.filter_by(ordre_id = standardorder.id).all()
+    standard_details = []
+    if standardorder:
+        standard_details = Ordreoversikt.query.filter_by(ordre_id = standardorder.id).all()
     print("STANDARDORDER", standardorder)
     print("STANDARDORDER DETAILS", standard_details)
 

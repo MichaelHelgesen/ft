@@ -1,0 +1,11 @@
+{% extends "base.html" %} 
+
+{% block content%}
+<h1>Leilighetsdata for {{ apartment }}</h1>
+{% if apartmentdata %}
+<h2>Leilighetsdata</h2>
+        {% for data in apartmentdata %}
+            <div>{{ data.datatype }} - {{ data.verdi }}</div>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

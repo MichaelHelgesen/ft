@@ -2,9 +2,9 @@
 
 {% block content%}
 <h1>Dine leiligheter</h1>
-    {% if user_apartments %}
-        {% for apartments in user_apartments %}
-            <a href="{{url_for('user_apartments.apartment_rooms', apartment=apartments.apartment_id)}}">{{ apartments.apartment_id }}</a>
+    {% if user_apartment_list %}
+        {% for apartments in user_apartment_list %}
+            <a href="{{url_for('user_apartments.apartment_data', apartment=apartments.apartment_id)}}">{{ apartments.apartment_id }}</a>
         {% endfor %}
     {% endif %}
     

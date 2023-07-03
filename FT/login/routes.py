@@ -143,7 +143,7 @@ def admin_user_update(id):
     
     # join lar oss filtrere mot en annen tabell, uten å ta den med.
     # Sjekk om bruker har leiligheter
-    user_selected_apartments = db.session.query(Apartments).join(apartments_users).filter(Apartments.id == apartments_users.columns.apartment_id).all()
+    user_selected_apartments = db.session.query(Apartments).join(apartments_users).filter(apartments_users.columns.user_id == user.id).all()
     print("USER SELECTED", user_selected_apartments)
     
     # Gjeldende leilighet

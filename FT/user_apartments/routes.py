@@ -21,9 +21,26 @@ user_apartments = Blueprint('user_apartments', __name__, static_folder="static",
 @login_required
 def apartment_list():
         user_apartments = Apartments.query.filter_by(id = current_user.apartment_id).all()
-        return render_template("apartment.html", name=current_user, user_apartments=user_apartments)
+        user_apartment_list = db.session.query(Apartments).join(apartments_users).filter(apartments_users.columns.user_id == current_user.id).all()
+        return render_template("apartment.html", name=current_user, user_apartments=user_apartments, user_apartment_list=user_apartment_list)
+
 
 @user_apartments.route('/apartment/<string:apartment>', methods=["GET", "POST"])
+@login_required
+def apartment_data(apartment):
+        # Hent leilighetsdata
+        user_apartments = Apartments.query.filter_by(id = current_user.apartment_id).first()
+        apartment_data = Apartmentdata.query.filter_by(apartment_id = user_apartments.id).all()
+        apartmenttype = db.session.query(Apartmenttype).join(Apartments.apartmenttype).filter(Apartments.id == user_apartments.id).first()
+
+        user_rooms = Room.query.filter_by(apartmenttype = apartmenttype.id).all()
+        print(user_rooms)
+        print(user_apartments.id)
+        return render_template("apartment_data.html", user_rooms=user_rooms, apartment=apartment, apartmentdata=apartment_data)
+
+
+
+@user_apartments.route('/shop/<string:apartment>', methods=["GET", "POST"])
 @login_required
 def apartment_rooms(apartment):
         # Hent leilighetsdata
